@@ -12,22 +12,25 @@ cargo build --release -p brain-mcp
 
 ### 2. Register with Claude Code
 
-Add to `~/.claude/settings.json` (create the `mcpServers` key if it doesn't exist):
-
-```json
-{
-  "mcpServers": {
-    "brain": {
-      "command": "/absolute/path/to/target/release/claude-brain",
-      "args": []
-    }
-  }
-}
+```bash
+claude mcp add --scope user brain -- /absolute/path/to/target/release/claude-brain
 ```
 
 Replace `/absolute/path/to` with the actual path to this repo.
 
-### 3. Restart Claude Code
+### 3. Allow tools without prompting (optional)
+
+By default, Claude Code asks permission each time a brain tool is used. To allow all brain tools globally, add `"mcp__brain__*"` to the `permissions.allow` array in `~/.claude/settings.json`:
+
+```json
+"permissions": {
+  "allow": [
+    "mcp__brain__*"
+  ]
+}
+```
+
+### 4. Restart Claude Code
 
 Close and reopen Claude Code (or start a new session). The brain MCP server starts automatically. You can verify it's connected — Claude will have access to the `brain_*` tools.
 
@@ -64,18 +67,8 @@ The database is created automatically at `~/.config/claude-brain/brain.db`.
 
 Override with the `BRAIN_DB_PATH` environment variable:
 
-```json
-{
-  "mcpServers": {
-    "brain": {
-      "command": "/path/to/claude-brain",
-      "args": [],
-      "env": {
-        "BRAIN_DB_PATH": "/custom/path/brain.db"
-      }
-    }
-  }
-}
+```bash
+claude mcp add --scope user -e BRAIN_DB_PATH=/custom/path/brain.db brain -- /path/to/claude-brain
 ```
 
 ## Tools Reference
