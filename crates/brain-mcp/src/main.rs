@@ -15,8 +15,9 @@ async fn main() -> Result<()> {
 
     let db_path = std::env::var("BRAIN_DB_PATH")
         .unwrap_or_else(|_| {
-            let dir = dirs::config_dir()
+            let dir = dirs::home_dir()
                 .unwrap_or_else(|| std::path::PathBuf::from("."))
+                .join(".config")
                 .join("claude-brain");
             std::fs::create_dir_all(&dir).ok();
             dir.join("brain.db").to_string_lossy().to_string()

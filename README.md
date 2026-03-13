@@ -60,10 +60,7 @@ Entries are indexed with SQLite FTS5 (full-text search). When Claude searches, i
 
 ### Where Data Lives
 
-The database is created automatically at:
-
-- **macOS:** `~/Library/Application Support/claude-brain/brain.db`
-- **Linux:** `~/.config/claude-brain/brain.db`
+The database is created automatically at `~/.config/claude-brain/brain.db`.
 
 Override with the `BRAIN_DB_PATH` environment variable:
 
