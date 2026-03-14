@@ -10,14 +10,18 @@ fn resolve_db_path() -> String {
     if let Ok(path) = std::env::var("BRAIN_DB_PATH") {
         return path;
     }
-    let config_dir = dirs::config_dir()
-        .expect("Could not determine config directory")
+    let dir = dirs::home_dir()
+        .unwrap_or_else(|| std::path::PathBuf::from("."))
+        .join(".config")
         .join("claude-brain");
-    config_dir.join("brain.db").to_string_lossy().to_string()
+    dir.join("brain.db").to_string_lossy().to_string()
 }
 
 fn main() {
     let db_path = resolve_db_path();
+    if let Some(parent) = std::path::Path::new(&db_path).parent() {
+        std::fs::create_dir_all(parent).ok();
+    }
     let db =
         Database::open(&db_path).unwrap_or_else(|_| panic!("Failed to open database at {db_path}"));
     let app_state = AppState::new(db);
