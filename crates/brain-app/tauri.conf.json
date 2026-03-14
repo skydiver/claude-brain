@@ -1,7 +1,7 @@
 {
-  "productName": "Claude Brain",
+  "productName": "ClaudeBrain",
   "version": "0.1.0",
-  "identifier": "com.claude-brain.app",
+  "identifier": "com.claude-brain.desktop",
   "build": {
     "frontendDist": "../brain-app-frontend/dist"
   },
@@ -9,7 +9,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "Claude Brain",
+        "title": "ClaudeBrain",
         "width": 1200,
         "height": 800,
         "minWidth": 800,
