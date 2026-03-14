@@ -49,7 +49,7 @@ claude-brain is an [MCP server](https://modelcontextprotocol.io/) that runs as a
 
 ### What Gets Stored
 
-Every entry has a **type**, **title**, **content**, and optional metadata (technology, project, tags).
+Every entry has a **type**, **title**, **content** (markdown), and optional metadata (technology, project, tags).
 
 | Type              | When to use                                   | Example                                               |
 | ----------------- | --------------------------------------------- | ----------------------------------------------------- |

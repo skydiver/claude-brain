@@ -19,7 +19,7 @@ pub struct StoreEntryRequest {
     pub r#type: String,
     #[schemars(description = "Short descriptive title for the entry")]
     pub title: String,
-    #[schemars(description = "Full content of the knowledge entry")]
+    #[schemars(description = "Full content of the knowledge entry (markdown formatted)")]
     pub content: String,
     #[schemars(description = "Technology this relates to (e.g., 'swift', 'rust', 'sqlite')")]
     pub technology: Option<String>,
@@ -35,7 +35,7 @@ pub struct UpdateEntryRequest {
     pub id: i64,
     #[schemars(description = "New title (omit to keep current)")]
     pub title: Option<String>,
-    #[schemars(description = "New content (omit to keep current)")]
+    #[schemars(description = "New content in markdown (omit to keep current)")]
     pub content: Option<String>,
     #[schemars(description = "New technology (omit to keep current)")]
     pub technology: Option<String>,
