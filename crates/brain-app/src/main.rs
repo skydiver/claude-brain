@@ -14,7 +14,13 @@ fn resolve_db_path() -> String {
         .unwrap_or_else(|| std::path::PathBuf::from("."))
         .join(".config")
         .join("claude-brain");
-    dir.join("brain.db").to_string_lossy().to_string()
+    if cfg!(debug_assertions) {
+        dir.join("db-dev").join("brain.db")
+    } else {
+        dir.join("brain.db")
+    }
+    .to_string_lossy()
+    .to_string()
 }
 
 fn main() {

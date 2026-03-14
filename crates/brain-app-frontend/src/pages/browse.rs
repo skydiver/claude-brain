@@ -278,7 +278,20 @@ pub fn BrowsePage() -> impl IntoView {
                 <button
                     class="p-2 text-gray-400 hover:text-accent rounded"
                     title="Refresh"
-                    on:click=move |_| fetch_entries()
+                    on:click=move |_| {
+                        fetch_entries();
+                        spawn_local(async move {
+                            if let Ok(techs) = api::list_technologies().await {
+                                set_technologies.set(techs);
+                            }
+                            if let Ok(t) = api::list_tags().await {
+                                set_tags.set(t);
+                            }
+                            if let Ok(s) = api::fetch_stats().await {
+                                set_stats.set(Some(s));
+                            }
+                        });
+                    }
                 >
                     "⟳"
                 </button>
