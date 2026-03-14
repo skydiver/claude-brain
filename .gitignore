@@ -23,6 +23,18 @@ Cargo.lock
 *.swo
 *~
 
+# Node
+node_modules/
+
+# Trunk/WASM build output
+dist/
+
+# Tailwind generated CSS
+**/tailwind-output.css
+
+# Tauri auto-generated schemas
+**/gen/schemas/
+
 # OS
 .DS_Store
 Thumbs.db
