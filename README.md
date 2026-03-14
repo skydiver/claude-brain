@@ -70,3 +70,7 @@ make test
 ```
 
 Runs 45 tests across the workspace: brain-core (30), brain-app (7), brain-app-frontend (8).
+
+## License
+
+[MIT](LICENSE)

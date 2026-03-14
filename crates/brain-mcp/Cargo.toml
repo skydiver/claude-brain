@@ -1,7 +1,10 @@
 [package]
 name = "brain-mcp"
-version = "0.1.0"
-edition = "2024"
+description = "MCP server for claude-brain: exposes the knowledge store to Claude Code"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [[bin]]
 name = "claude-brain"

@@ -1,7 +1,10 @@
 [package]
 name = "brain-core"
-version = "0.1.0"
-edition = "2024"
+description = "Shared library for claude-brain: SQLite storage, models, and FTS5 search"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [dependencies]
 rusqlite = { version = "0.34", features = ["bundled"] }
