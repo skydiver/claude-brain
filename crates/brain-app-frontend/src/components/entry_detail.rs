@@ -14,7 +14,7 @@ pub fn EntryDetail(
     on_tech_click: Callback<String>,
 ) -> impl IntoView {
     view! {
-        <div class="flex-1 bg-background">
+        <div class="flex-1 min-w-0 bg-background">
             <ScrollArea class="h-full">
                 <Show
                     when=move || entry.get().is_some()
@@ -69,7 +69,7 @@ pub fn EntryDetail(
 
                                 // Rendered content
                                 <div
-                                    class="prose prose-sm dark:prose-invert max-w-none mt-4"
+                                    class="prose prose-sm dark:prose-invert max-w-none mt-4 overflow-hidden [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto"
                                     inner_html=rendered_content
                                 />
 
