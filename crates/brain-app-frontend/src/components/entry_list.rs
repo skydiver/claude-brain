@@ -5,6 +5,7 @@ use crate::components::type_icon::TypeIcon;
 use crate::components::ui::button::{Button, ButtonSize, ButtonVariant};
 use crate::components::ui::scroll_area::ScrollArea;
 use crate::models::Entry;
+use leptos_icons::Icon;
 
 #[component]
 pub fn EntryList(
@@ -39,9 +40,7 @@ pub fn EntryList(
                     class="shrink-0 size-8"
                     on:click=move |_| on_refresh.run(())
                 >
-                    <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                    </svg>
+                    <span class="size-3.5"><Icon icon=icondata::LuRefreshCw /></span>
                 </Button>
             </div>
 

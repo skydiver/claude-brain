@@ -7,12 +7,21 @@ use crate::api;
 use crate::components::entry_detail::EntryDetail;
 use crate::components::entry_list::EntryList;
 use crate::components::sidebar::Sidebar;
+use leptos_icons::Icon;
 use crate::models::{Entry, Stats};
 
 const PAGE_SIZE: u32 = 20;
 
 #[component]
 pub fn BrowsePage() -> impl IntoView {
+    // UI state — restore sidebar visibility from localStorage
+    let initial_sidebar = web_sys::window()
+        .and_then(|w| w.local_storage().ok().flatten())
+        .and_then(|s: web_sys::Storage| s.get_item("sidebar_visible").ok().flatten())
+        .map(|v| v != "false")
+        .unwrap_or(true);
+    let (sidebar_visible, set_sidebar_visible) = signal(initial_sidebar);
+
     // Filter state
     let (selected_type, set_selected_type) = signal(None::<String>);
     let (selected_technology, set_selected_technology) = signal(None::<String>);
@@ -352,22 +361,47 @@ pub fn BrowsePage() -> impl IntoView {
                         class="h-[38px] shrink-0 border-b border-border flex items-center pl-[90px] select-none cursor-default"
                     >
                         <span class="text-xs font-semibold text-muted-foreground">"ClaudeBrain"</span>
+                        <div class="mx-3 h-4 w-px bg-border"></div>
+                        <button
+                            class=move || format!(
+                                "p-1 rounded transition-colors {}",
+                                if sidebar_visible.get() { "bg-muted text-foreground" } else { "text-muted-foreground hover:bg-muted" }
+                            )
+                            title="Toggle filters"
+                            on:click=move |e: web_sys::MouseEvent| {
+                                e.stop_propagation();
+                                let new_state = !sidebar_visible.get_untracked();
+                                set_sidebar_visible.set(new_state);
+                                if let Some(storage) = web_sys::window()
+                                    .and_then(|w| -> Option<web_sys::Storage> { w.local_storage().ok().flatten() })
+                                {
+                                    let _ = storage.set_item("sidebar_visible", &new_state.to_string());
+                                }
+                            }
+                        >
+                            <span class="size-3.5"><Icon icon=icondata::LuPanelLeft /></span>
+                        </button>
                     </div>
                 }
             }
 
             // Three-pane layout
             <div class="flex flex-1 min-h-0">
-                <Sidebar
-                    selected_type=selected_type
-                    set_selected_type=set_selected_type
-                    technologies=technologies
-                    selected_technology=selected_technology
-                    set_selected_technology=set_selected_technology
-                    tags=tags
-                    selected_tags=selected_tags
-                    set_selected_tags=set_selected_tags
-                />
+                <div class=move || format!(
+                    "transition-all duration-300 ease-in-out overflow-hidden {}",
+                    if sidebar_visible.get() { "w-[200px] min-w-[200px]" } else { "w-0 min-w-0" }
+                )>
+                    <Sidebar
+                        selected_type=selected_type
+                        set_selected_type=set_selected_type
+                        technologies=technologies
+                        selected_technology=selected_technology
+                        set_selected_technology=set_selected_technology
+                        tags=tags
+                        selected_tags=selected_tags
+                        set_selected_tags=set_selected_tags
+                    />
+                </div>
                 <EntryList
                     entries=entries
                     total=total

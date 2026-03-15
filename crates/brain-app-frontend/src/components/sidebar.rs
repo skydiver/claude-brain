@@ -23,7 +23,7 @@ pub fn Sidebar(
     ];
 
     view! {
-        <aside class="w-[200px] min-w-[200px] border-r border-border bg-card">
+        <aside class="w-[200px] min-w-[200px] border-r border-border bg-card h-full">
             <ScrollArea class="h-full">
                 <div class="p-4 space-y-4">
                     // Type filter

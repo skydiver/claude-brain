@@ -4,6 +4,7 @@ use wasm_bindgen::prelude::*;
 use web_sys::HtmlInputElement;
 
 use crate::components::ui::button::{Button, ButtonSize, ButtonVariant};
+use leptos_icons::Icon;
 
 #[component]
 pub fn SearchBar(value: ReadSignal<String>, on_search: Callback<String>) -> impl IntoView {
@@ -49,9 +50,7 @@ pub fn SearchBar(value: ReadSignal<String>, on_search: Callback<String>) -> impl
 
     view! {
         <div class="relative flex items-center flex-1">
-            <svg class="absolute left-3 w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
+            <span class="absolute left-3 size-4 text-muted-foreground"><Icon icon=icondata::LuSearch /></span>
             <input
                 node_ref=input_ref
                 type="text"

@@ -25,11 +25,13 @@ js-sys = "0.3"
 web-sys = { version = "0.3", features = [
     "Window", "Document", "HtmlElement", "HtmlInputElement",
     "MediaQueryList", "MediaQueryListEvent", "EventTarget",
-    "VisibilityState", "KeyboardEvent", "Event",
+    "VisibilityState", "KeyboardEvent", "Event", "Storage",
 ] }
 pulldown-cmark = { version = "0.12", default-features = false, features = ["html"] }
 leptos_ui = "0.3"
 tw_merge = "0.1"
+leptos_icons = "0.7"
+icondata = "0.7"
 
 [package.metadata.leptos]
 tailwind-input-file = "styles/main.css"

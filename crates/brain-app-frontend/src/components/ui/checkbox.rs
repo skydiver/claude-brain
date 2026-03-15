@@ -1,4 +1,5 @@
 use leptos::prelude::*;
+use leptos_icons::Icon;
 use tw_merge::tw_merge;
 
 #[component]
@@ -37,7 +38,7 @@ pub fn Checkbox(
             <span data-name="CheckboxIndicator" class="flex justify-center items-center text-current transition-none">
                 {move || {
                     if checked.get() {
-                        view! { <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> }.into_any()
+                        view! { <span class="size-3.5"><Icon icon=icondata::LuCheck /></span> }.into_any()
                     } else {
                         view! { <span></span> }.into_any()
                     }
