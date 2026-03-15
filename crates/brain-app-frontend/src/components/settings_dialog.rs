@@ -9,10 +9,16 @@ use crate::components::ui::select::{
 use crate::models::Theme;
 use crate::settings::SettingsContext;
 
+/// Signal indicating whether the settings dialog is open.
+/// Provided via context so titlebar buttons can check it.
+#[derive(Clone, Copy)]
+pub struct SettingsOpen(pub ReadSignal<bool>);
+
 #[component]
 pub fn SettingsDialog() -> impl IntoView {
     let ctx = expect_context::<SettingsContext>();
     let (open, set_open) = signal(false);
+    provide_context(SettingsOpen(open));
     let (active_category, _set_active_category) = signal("appearance".to_string());
 
     // Close on Escape
@@ -53,11 +59,20 @@ pub fn SettingsDialog() -> impl IntoView {
     view! {
         // Trigger button — matches titlebar button style exactly
         <button
-            class="p-1 rounded text-muted-foreground hover:bg-muted transition-colors"
+            class=move || format!(
+                "p-1 rounded transition-colors {}",
+                if open.get() {
+                    "text-muted-foreground opacity-20 cursor-default"
+                } else {
+                    "text-muted-foreground hover:bg-muted"
+                }
+            )
             title="Settings"
             on:click=move |e: web_sys::MouseEvent| {
                 e.stop_propagation();
-                set_open.set(true);
+                if !open.get_untracked() {
+                    set_open.set(true);
+                }
             }
         >
             <span class="size-3.5"><Icon icon=icondata::LuSettings /></span>

@@ -361,33 +361,57 @@ pub fn BrowsePage() -> impl IntoView {
                     >
                         <span class="text-xs font-semibold text-muted-foreground">"ClaudeBrain"</span>
                         <div class="mx-3 h-4 w-px bg-border"></div>
-                        <button
-                            class=move || format!(
-                                "p-1 rounded transition-colors mr-auto {}",
-                                if filters_sidebar_visible.get() { "bg-muted text-foreground" } else { "text-muted-foreground hover:bg-muted" }
-                            )
-                            title="Toggle filters"
-                            on:click=move |e: web_sys::MouseEvent| {
-                                e.stop_propagation();
-                                let new_state = !filters_sidebar_visible.get_untracked();
-                                set_filters_sidebar_visible.set(new_state);
-                                let mut settings = ctx.settings.get_untracked();
-                                settings.appearance.filters_sidebar_visible = new_state;
-                                ctx.update(settings);
+                        {
+                            let settings_open = move || {
+                                use_context::<crate::components::settings_dialog::SettingsOpen>()
+                                    .map(|s| s.0.get())
+                                    .unwrap_or(false)
+                            };
+                            view! {
+                                <button
+                                    class=move || format!(
+                                        "p-1 rounded transition-colors mr-auto {}",
+                                        if settings_open() {
+                                            "text-muted-foreground opacity-20 cursor-default"
+                                        } else if filters_sidebar_visible.get() {
+                                            "bg-muted text-foreground"
+                                        } else {
+                                            "text-muted-foreground hover:bg-muted"
+                                        }
+                                    )
+                                    title="Toggle filters"
+                                    on:click=move |e: web_sys::MouseEvent| {
+                                        e.stop_propagation();
+                                        if settings_open() { return; }
+                                        let new_state = !filters_sidebar_visible.get_untracked();
+                                        set_filters_sidebar_visible.set(new_state);
+                                        let mut settings = ctx.settings.get_untracked();
+                                        settings.appearance.filters_sidebar_visible = new_state;
+                                        ctx.update(settings);
+                                    }
+                                >
+                                    <span class="size-3.5"><Icon icon=icondata::LuPanelLeft /></span>
+                                </button>
+                                <button
+                                    class=move || format!(
+                                        "p-1 rounded transition-colors {}",
+                                        if settings_open() {
+                                            "text-muted-foreground opacity-20 cursor-default"
+                                        } else {
+                                            "text-muted-foreground hover:bg-muted"
+                                        }
+                                    )
+                                    title="Refresh"
+                                    on:click=move |e: web_sys::MouseEvent| {
+                                        e.stop_propagation();
+                                        if settings_open() { return; }
+                                        on_refresh.run(());
+                                    }
+                                >
+                                    <span class="size-3.5"><Icon icon=icondata::LuRefreshCw /></span>
+                                </button>
                             }
-                        >
-                            <span class="size-3.5"><Icon icon=icondata::LuPanelLeft /></span>
-                        </button>
-                        <button
-                            class="p-1 rounded text-muted-foreground hover:bg-muted transition-colors"
-                            title="Refresh"
-                            on:click=move |e: web_sys::MouseEvent| {
-                                e.stop_propagation();
-                                on_refresh.run(());
-                            }
-                        >
-                            <span class="size-3.5"><Icon icon=icondata::LuRefreshCw /></span>
-                        </button>
+                        }
                         <SettingsDialog />
                     </div>
                 }
