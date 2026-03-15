@@ -1,0 +1,32 @@
+.theme-solarized-dark {
+  --background: #002b36;
+  --foreground: #839496;
+  --card: #073642;
+  --card-foreground: #93a1a1;
+  --popover: #073642;
+  --popover-foreground: #93a1a1;
+  --primary: #268bd2;
+  --primary-foreground: #fdf6e3;
+  --secondary: #073642;
+  --secondary-foreground: #93a1a1;
+  --muted: #073642;
+  --muted-foreground: #657b83;
+  --accent: #073642;
+  --accent-foreground: #268bd2;
+  --destructive: #dc322f;
+  --destructive-foreground: #fdf6e3;
+  --border: #586e75;
+  --input: #586e75;
+  --ring: #268bd2;
+  --color-surface: #073642;
+  --color-accent: #268bd2;
+  --color-type-learning: #268bd2;
+  --color-type-gotcha: #cb4b16;
+  --color-type-project: #859900;
+  --success-light: #073642;
+  --success-dark: #859900;
+  --warning-light: #073642;
+  --warning-dark: #b58900;
+  --info-light: #073642;
+  --info-dark: #268bd2;
+}

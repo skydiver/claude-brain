@@ -12,16 +12,28 @@ use crate::settings::SettingsContext;
 type ListenerHandle =
     Option<(Closure<dyn FnMut(web_sys::MediaQueryListEvent)>, web_sys::MediaQueryList)>;
 
-fn apply_dark_class(dark: bool) {
+const THEME_CLASSES: &[&str] = &[
+    "dark",
+    "theme-solarized-dark",
+    "theme-nord",
+    "theme-catppuccin-mocha",
+    "theme-dracula",
+    "theme-tokyo-night",
+];
+
+fn apply_theme_class(class: Option<&str>) {
     if let Some(el) = window()
         .and_then(|w| w.document())
         .and_then(|d| d.document_element())
     {
         let class_list = el.class_list();
-        if dark {
-            let _ = class_list.add_1("dark");
-        } else {
-            let _ = class_list.remove_1("dark");
+        // Remove all theme classes
+        for &cls in THEME_CLASSES {
+            let _ = class_list.remove_1(cls);
+        }
+        // Apply the requested class
+        if let Some(cls) = class {
+            let _ = class_list.add_1(cls);
         }
     }
 }
@@ -57,13 +69,13 @@ pub fn init_theme() {
 
         match theme {
             Theme::System => {
-                apply_dark_class(is_os_dark());
+                apply_theme_class(if is_os_dark() { Some("dark") } else { None });
                 // Set up matchMedia listener
                 if let Some(win) = window() {
                     if let Ok(Some(mql)) = win.match_media("(prefers-color-scheme: dark)") {
                         let closure = Closure::wrap(
                             Box::new(move |event: web_sys::MediaQueryListEvent| {
-                                apply_dark_class(event.matches());
+                                apply_theme_class(if event.matches() { Some("dark") } else { None });
                             })
                                 as Box<dyn FnMut(_)>,
                         );
@@ -75,8 +87,13 @@ pub fn init_theme() {
                     }
                 }
             }
-            Theme::DefaultDark => apply_dark_class(true),
-            Theme::DefaultLight => apply_dark_class(false),
+            Theme::DefaultDark => apply_theme_class(Some("dark")),
+            Theme::DefaultLight => apply_theme_class(None),
+            Theme::SolarizedDark => apply_theme_class(Some("theme-solarized-dark")),
+            Theme::Nord => apply_theme_class(Some("theme-nord")),
+            Theme::CatppuccinMocha => apply_theme_class(Some("theme-catppuccin-mocha")),
+            Theme::Dracula => apply_theme_class(Some("theme-dracula")),
+            Theme::TokyoNight => apply_theme_class(Some("theme-tokyo-night")),
         }
     });
 }

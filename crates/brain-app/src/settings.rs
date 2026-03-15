@@ -9,6 +9,11 @@ pub enum Theme {
     System,
     DefaultDark,
     DefaultLight,
+    SolarizedDark,
+    Nord,
+    CatppuccinMocha,
+    Dracula,
+    TokyoNight,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

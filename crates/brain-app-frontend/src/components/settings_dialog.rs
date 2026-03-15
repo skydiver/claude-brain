@@ -37,6 +37,11 @@ pub fn SettingsDialog() -> impl IntoView {
         Theme::System => "system",
         Theme::DefaultDark => "default-dark",
         Theme::DefaultLight => "default-light",
+        Theme::SolarizedDark => "solarized-dark",
+        Theme::Nord => "nord",
+        Theme::CatppuccinMocha => "catppuccin-mocha",
+        Theme::Dracula => "dracula",
+        Theme::TokyoNight => "tokyo-night",
     }
     .to_string();
 
@@ -88,10 +93,10 @@ pub fn SettingsDialog() -> impl IntoView {
 
             // Dialog — inside backdrop to block interaction with app below
             <div
-                class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] bg-background border border-border rounded-2xl shadow-lg max-w-[600px] w-[calc(100%-2rem)]"
+                class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] bg-background border border-border rounded-2xl shadow-lg max-w-[700px] w-[calc(100%-2rem)]"
                 on:mousedown=move |e: web_sys::MouseEvent| e.stop_propagation()
             >
-                <div class="flex min-h-[400px]">
+                <div class="flex min-h-[500px]">
                     // Category sidebar
                     <div class="w-[180px] border-r border-border p-2 space-y-0.5">
                         <button class=move || {
@@ -163,6 +168,11 @@ fn ThemeSelect(
     let display_label = move || match value.get().as_str() {
         "default-dark" => "Default Dark",
         "default-light" => "Default Light",
+        "solarized-dark" => "Solarized Dark",
+        "nord" => "Nord",
+        "catppuccin-mocha" => "Catppuccin Mocha",
+        "dracula" => "Dracula",
+        "tokyo-night" => "Tokyo Night",
         _ => "System",
     };
 
@@ -197,7 +207,7 @@ fn ThemeSelect(
     };
 
     view! {
-        <div class="relative w-[160px]">
+        <div class="relative w-[200px]">
             <button
                 type="button"
                 class="w-full h-9 px-3 inline-flex items-center justify-between text-sm rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -221,6 +231,12 @@ fn ThemeSelect(
                     {make_option("system", "System", Theme::System)}
                     {make_option("default-dark", "Default Dark", Theme::DefaultDark)}
                     {make_option("default-light", "Default Light", Theme::DefaultLight)}
+                    <div class="my-1 h-px bg-border" />
+                    {make_option("solarized-dark", "Solarized Dark", Theme::SolarizedDark)}
+                    {make_option("nord", "Nord", Theme::Nord)}
+                    {make_option("catppuccin-mocha", "Catppuccin Mocha", Theme::CatppuccinMocha)}
+                    {make_option("dracula", "Dracula", Theme::Dracula)}
+                    {make_option("tokyo-night", "Tokyo Night", Theme::TokyoNight)}
                 </div>
             </Show>
         </div>
