@@ -66,6 +66,7 @@ pub enum Theme {
     CatppuccinMocha,
     Dracula,
     TokyoNight,
+    Cobalt2,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

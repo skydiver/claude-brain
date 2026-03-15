@@ -19,6 +19,7 @@ const THEME_CLASSES: &[&str] = &[
     "theme-catppuccin-mocha",
     "theme-dracula",
     "theme-tokyo-night",
+    "theme-cobalt2",
 ];
 
 fn apply_theme_class(class: Option<&str>) {
@@ -94,6 +95,7 @@ pub fn init_theme() {
             Theme::CatppuccinMocha => apply_theme_class(Some("theme-catppuccin-mocha")),
             Theme::Dracula => apply_theme_class(Some("theme-dracula")),
             Theme::TokyoNight => apply_theme_class(Some("theme-tokyo-night")),
+            Theme::Cobalt2 => apply_theme_class(Some("theme-cobalt2")),
         }
     });
 }

@@ -42,6 +42,7 @@ pub fn SettingsDialog() -> impl IntoView {
         Theme::CatppuccinMocha => "catppuccin-mocha",
         Theme::Dracula => "dracula",
         Theme::TokyoNight => "tokyo-night",
+        Theme::Cobalt2 => "cobalt2",
     }
     .to_string();
 
@@ -173,6 +174,7 @@ fn ThemeSelect(
         "catppuccin-mocha" => "Catppuccin Mocha",
         "dracula" => "Dracula",
         "tokyo-night" => "Tokyo Night",
+        "cobalt2" => "Cobalt2",
         _ => "System",
     };
 
@@ -237,6 +239,7 @@ fn ThemeSelect(
                     {make_option("catppuccin-mocha", "Catppuccin Mocha", Theme::CatppuccinMocha)}
                     {make_option("dracula", "Dracula", Theme::Dracula)}
                     {make_option("tokyo-night", "Tokyo Night", Theme::TokyoNight)}
+                    {make_option("cobalt2", "Cobalt2", Theme::Cobalt2)}
                 </div>
             </Show>
         </div>
