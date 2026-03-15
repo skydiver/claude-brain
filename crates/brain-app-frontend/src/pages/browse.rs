@@ -6,14 +6,22 @@ use wasm_bindgen_futures::spawn_local;
 use crate::api;
 use crate::components::entry_detail::EntryDetail;
 use crate::components::entry_list::EntryList;
-use crate::components::search_bar::SearchBar;
 use crate::components::sidebar::Sidebar;
+use leptos_icons::Icon;
 use crate::models::{Entry, Stats};
 
 const PAGE_SIZE: u32 = 20;
 
 #[component]
 pub fn BrowsePage() -> impl IntoView {
+    // UI state — restore sidebar visibility from localStorage
+    let initial_sidebar = web_sys::window()
+        .and_then(|w| w.local_storage().ok().flatten())
+        .and_then(|s: web_sys::Storage| s.get_item("sidebar_visible").ok().flatten())
+        .map(|v| v != "false")
+        .unwrap_or(true);
+    let (sidebar_visible, set_sidebar_visible) = signal(initial_sidebar);
+
     // Filter state
     let (selected_type, set_selected_type) = signal(None::<String>);
     let (selected_technology, set_selected_technology) = signal(None::<String>);
@@ -52,14 +60,10 @@ pub fn BrowsePage() -> impl IntoView {
 
         spawn_local(async move {
             if !query.is_empty() {
-                // FTS search mode
-                match api::search_entries(query, entry_type, tech, None, Some(PAGE_SIZE)).await {
+                match api::search_entries(query, entry_type, tech, Some(PAGE_SIZE)).await {
                     Ok(resp) => {
-                        let search_entries: Vec<Entry> =
-                            resp.entries.into_iter().map(|fe| fe.entry).collect();
-                        let len = search_entries.len();
-                        set_entries.set(search_entries);
-                        set_total.set(len); // FTS doesn't return a total
+                        set_entries.set(resp.entries);
+                        set_total.set(resp.total);
                     }
                     Err(_) => {
                         set_entries.set(vec![]);
@@ -96,21 +100,50 @@ pub fn BrowsePage() -> impl IntoView {
 
     // Trigger fetch on any filter change
     Effect::new(move || {
-        let _ = search_query.get();
-        let _ = selected_type.get();
-        let _ = selected_technology.get();
-        let _ = selected_tags.get();
+        // Track all filter signals so this re-runs when any changes
+        let query = search_query.get();
+        let entry_type = selected_type.get();
+        let tech = selected_technology.get();
+        let tag_list = selected_tags.get();
+
+        // Reset pagination on filter change
         set_offset.set(0);
-        fetch_entries();
+
+        // Fetch with current values directly (not via closure that re-reads signals)
+        spawn_local(async move {
+            if !query.is_empty() {
+                match api::search_entries(query, entry_type, tech, Some(PAGE_SIZE)).await {
+                    Ok(resp) => {
+                        set_entries.set(resp.entries);
+                        set_total.set(resp.total);
+                    }
+                    Err(_) => {
+                        set_entries.set(vec![]);
+                        set_total.set(0);
+                    }
+                }
+            } else {
+                let tags_str = if tag_list.is_empty() {
+                    None
+                } else {
+                    Some(tag_list.join(","))
+                };
+                match api::list_entries(entry_type, tech, tags_str, Some(PAGE_SIZE), Some(0)).await {
+                    Ok(resp) => {
+                        set_entries.set(resp.entries);
+                        set_total.set(resp.total);
+                    }
+                    Err(_) => {
+                        set_entries.set(vec![]);
+                        set_total.set(0);
+                    }
+                }
+            }
+        });
     });
 
     // Search callback
     let on_search = Callback::new(move |query: String| {
-        if !query.is_empty() {
-            set_selected_type.set(None);
-            set_selected_technology.set(None);
-            set_selected_tags.set(vec![]);
-        }
         set_search_query.set(query);
     });
 
@@ -127,6 +160,22 @@ pub fn BrowsePage() -> impl IntoView {
     let on_load_more = Callback::new(move |_: ()| {
         set_offset.set(offset.get_untracked() + PAGE_SIZE);
         fetch_entries();
+    });
+
+    // Refresh all data
+    let on_refresh = Callback::new(move |_: ()| {
+        fetch_entries();
+        spawn_local(async move {
+            if let Ok(techs) = api::list_technologies().await {
+                set_technologies.set(techs);
+            }
+            if let Ok(t) = api::list_tags().await {
+                set_tags.set(t);
+            }
+            if let Ok(s) = api::fetch_stats().await {
+                set_stats.set(Some(s));
+            }
+        });
     });
 
     // Tag click from detail → add to filters
@@ -243,18 +292,7 @@ pub fn BrowsePage() -> impl IntoView {
         let closure = Closure::wrap(Box::new(move |_: web_sys::Event| {
             if let Some(doc) = web_sys::window().and_then(|w| w.document()) {
                 if doc.visibility_state() == web_sys::VisibilityState::Visible {
-                    fetch_entries();
-                    spawn_local(async move {
-                        if let Ok(techs) = api::list_technologies().await {
-                            set_technologies.set(techs);
-                        }
-                        if let Ok(t) = api::list_tags().await {
-                            set_tags.set(t);
-                        }
-                        if let Ok(s) = api::fetch_stats().await {
-                            set_stats.set(Some(s));
-                        }
-                    });
+                    on_refresh.run(());
                 }
             }
         }) as Box<dyn FnMut(_)>);
@@ -270,51 +308,118 @@ pub fn BrowsePage() -> impl IntoView {
 
     view! {
         <div class="flex flex-col h-screen">
-            // Top bar: search + refresh
-            <div class="p-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
-                <div class="flex-1">
-                    <SearchBar value=search_query on_search=on_search />
-                </div>
-                <button
-                    class="p-2 text-gray-400 hover:text-accent rounded"
-                    title="Refresh"
-                    on:click=move |_| {
-                        fetch_entries();
-                        spawn_local(async move {
-                            if let Ok(techs) = api::list_technologies().await {
-                                set_technologies.set(techs);
+            // Titlebar (draggable, overlays native titlebar)
+            {
+                let titlebar_ref = NodeRef::<leptos::html::Div>::new();
+                Effect::new(move || {
+                    if let Some(el) = titlebar_ref.get() {
+                        use wasm_bindgen::closure::Closure;
+                        use wasm_bindgen::JsCast;
+
+                        let closure = Closure::wrap(Box::new(move |e: web_sys::MouseEvent| {
+                            // Don't drag if clicking a button
+                            if let Some(target) = e.target() {
+                                if let Some(el) = target.dyn_ref::<web_sys::HtmlElement>() {
+                                    if el.closest("button").ok().flatten().is_some() {
+                                        return;
+                                    }
+                                }
                             }
-                            if let Ok(t) = api::list_tags().await {
-                                set_tags.set(t);
+                            if e.buttons() == 1 {
+                                // Call Tauri's startDragging via JS interop
+                                if let Some(window) = web_sys::window() {
+                                    if let Ok(tauri) = js_sys::Reflect::get(&window, &"__TAURI__".into()) {
+                                        if let Ok(win_mod) = js_sys::Reflect::get(&tauri, &"window".into()) {
+                                            if let Ok(get_current) = js_sys::Reflect::get(&win_mod, &"getCurrentWindow".into()) {
+                                                if let Ok(get_fn) = get_current.dyn_into::<js_sys::Function>() {
+                                                    if let Ok(app_win) = get_fn.call0(&wasm_bindgen::JsValue::NULL) {
+                                                        if let Ok(drag_fn) = js_sys::Reflect::get(&app_win, &"startDragging".into()) {
+                                                            if let Ok(drag) = drag_fn.dyn_into::<js_sys::Function>() {
+                                                                let _ = drag.call0(&app_win);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                            if let Ok(s) = api::fetch_stats().await {
-                                set_stats.set(Some(s));
-                            }
-                        });
+                        }) as Box<dyn FnMut(_)>);
+
+                        let _ = el.add_event_listener_with_callback(
+                            "mousedown",
+                            closure.as_ref().unchecked_ref(),
+                        );
+                        closure.forget();
                     }
-                >
-                    "⟳"
-                </button>
-            </div>
+                });
+
+                view! {
+                    <div
+                        node_ref=titlebar_ref
+                        class="h-[38px] shrink-0 border-b border-border flex items-center pl-[90px] pr-3 select-none cursor-default"
+                    >
+                        <span class="text-xs font-semibold text-muted-foreground">"ClaudeBrain"</span>
+                        <div class="mx-3 h-4 w-px bg-border"></div>
+                        <button
+                            class=move || format!(
+                                "p-1 rounded transition-colors mr-auto {}",
+                                if sidebar_visible.get() { "bg-muted text-foreground" } else { "text-muted-foreground hover:bg-muted" }
+                            )
+                            title="Toggle filters"
+                            on:click=move |e: web_sys::MouseEvent| {
+                                e.stop_propagation();
+                                let new_state = !sidebar_visible.get_untracked();
+                                set_sidebar_visible.set(new_state);
+                                if let Some(storage) = web_sys::window()
+                                    .and_then(|w| -> Option<web_sys::Storage> { w.local_storage().ok().flatten() })
+                                {
+                                    let _ = storage.set_item("sidebar_visible", &new_state.to_string());
+                                }
+                            }
+                        >
+                            <span class="size-3.5"><Icon icon=icondata::LuPanelLeft /></span>
+                        </button>
+                        <button
+                            class="p-1 rounded text-muted-foreground hover:bg-muted transition-colors"
+                            title="Refresh"
+                            on:click=move |e: web_sys::MouseEvent| {
+                                e.stop_propagation();
+                                on_refresh.run(());
+                            }
+                        >
+                            <span class="size-3.5"><Icon icon=icondata::LuRefreshCw /></span>
+                        </button>
+                    </div>
+                }
+            }
 
             // Three-pane layout
             <div class="flex flex-1 min-h-0">
-                <Sidebar
-                    selected_type=selected_type
-                    set_selected_type=set_selected_type
-                    technologies=technologies
-                    selected_technology=selected_technology
-                    set_selected_technology=set_selected_technology
-                    tags=tags
-                    selected_tags=selected_tags
-                    set_selected_tags=set_selected_tags
-                />
+                <div class=move || format!(
+                    "transition-all duration-300 ease-in-out overflow-hidden {}",
+                    if sidebar_visible.get() { "w-[200px] min-w-[200px]" } else { "w-0 min-w-0" }
+                )>
+                    <Sidebar
+                        selected_type=selected_type
+                        set_selected_type=set_selected_type
+                        technologies=technologies
+                        selected_technology=selected_technology
+                        set_selected_technology=set_selected_technology
+                        tags=tags
+                        selected_tags=selected_tags
+                        set_selected_tags=set_selected_tags
+                    />
+                </div>
                 <EntryList
                     entries=entries
                     total=total
                     selected_id=selected_id
                     on_select=on_select_entry
                     on_load_more=on_load_more
+                    search_value=search_query
+                    on_search=on_search
                 />
                 <EntryDetail
                     entry=selected_entry
@@ -324,7 +429,7 @@ pub fn BrowsePage() -> impl IntoView {
             </div>
 
             // Bottom stats bar
-            <div class="px-4 py-1.5 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 flex justify-between">
+            <div class="px-4 py-1.5 border-t border-border text-xs text-muted-foreground flex justify-between bg-card">
                 <span>{stats_text}</span>
                 <span class="font-mono">"brain.db"</span>
             </div>

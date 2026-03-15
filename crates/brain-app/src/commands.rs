@@ -11,17 +11,6 @@ pub struct SearchResponse {
     pub total: usize,
 }
 
-#[derive(Debug, Serialize)]
-pub struct FtsResponse {
-    pub entries: Vec<FtsEntry>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct FtsEntry {
-    #[serde(flatten)]
-    pub entry: Entry,
-    pub rank: f64,
-}
 
 fn entry_type_from_str(s: &str) -> Option<EntryType> {
     match s {
@@ -62,27 +51,21 @@ pub fn search_entries(
     query: String,
     entry_type: Option<String>,
     technology: Option<String>,
-    project: Option<String>,
     limit: Option<u32>,
-) -> Result<FtsResponse, String> {
+) -> Result<SearchResponse, String> {
     let db = state.db.lock().map_err(|e| e.to_string())?;
-    let results = db
-        .search_entries(
+    let (entries, total) = db
+        .search_like(
             &query,
             entry_type.as_deref().and_then(entry_type_from_str).as_ref(),
             technology.as_deref(),
-            project.as_deref(),
             limit.unwrap_or(20),
         )
         .map_err(|e| e.to_string())?;
-    let entries = results
-        .into_iter()
-        .map(|r| FtsEntry {
-            entry: r.entry,
-            rank: r.rank,
-        })
-        .collect();
-    Ok(FtsResponse { entries })
+    Ok(SearchResponse {
+        entries,
+        total: total as usize,
+    })
 }
 
 #[tauri::command]

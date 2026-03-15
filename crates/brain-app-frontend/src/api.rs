@@ -4,7 +4,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 use js_sys::Reflect;
 
-use crate::models::{Entry, FtsResponse, SearchResponse, Stats};
+use crate::models::{Entry, SearchResponse, Stats};
 
 /// Invoke a Tauri IPC command. Handles both success and error (rejected promise) cases.
 async fn invoke<T: serde::de::DeserializeOwned>(
@@ -72,8 +72,6 @@ struct SearchArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     technology: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    project: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
@@ -81,16 +79,14 @@ pub async fn search_entries(
     query: String,
     entry_type: Option<String>,
     technology: Option<String>,
-    project: Option<String>,
     limit: Option<u32>,
-) -> Result<FtsResponse, String> {
+) -> Result<SearchResponse, String> {
     invoke(
         "search_entries",
         SearchArgs {
             query,
             entry_type,
             technology,
-            project,
             limit,
         },
     )
@@ -104,16 +100,6 @@ struct GetEntryArgs {
 
 pub async fn get_entry(id: i64) -> Result<Entry, String> {
     invoke("get_entry", GetEntryArgs { id }).await
-}
-
-#[derive(Serialize)]
-struct ProjectContextArgs {
-    #[serde(rename = "projectPath")]
-    project_path: String,
-}
-
-pub async fn get_project_context(project_path: String) -> Result<SearchResponse, String> {
-    invoke("get_project_context", ProjectContextArgs { project_path }).await
 }
 
 pub async fn list_technologies() -> Result<Vec<String>, String> {

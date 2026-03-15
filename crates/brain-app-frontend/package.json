@@ -1,17 +1,17 @@
 {
-  "name": "brain-app-frontend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "tailwind.config.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
   "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "description": "",
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.19",
     "tailwindcss": "^3.4.19"
-  }
+  },
+  "keywords": [],
+  "license": "ISC",
+  "main": "tailwind.config.js",
+  "name": "brain-app-frontend",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "version": "1.0.0"
 }

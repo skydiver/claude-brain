@@ -3,13 +3,18 @@
   "version": "0.1.0",
   "identifier": "com.claude-brain.desktop",
   "build": {
-    "frontendDist": "../brain-app-frontend/dist"
+    "frontendDist": "../brain-app-frontend/dist",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "cd brain-app-frontend && trunk serve --port 1420"
   },
   "app": {
     "withGlobalTauri": true,
     "windows": [
       {
         "title": "ClaudeBrain",
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "trafficLightPosition": { "x": 12, "y": 20 },
         "width": 1200,
         "height": 800,
         "minWidth": 800,
@@ -21,12 +26,7 @@
   "bundle": {
     "active": true,
     "targets": ["app"],
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.png"
-    ]
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.png"]
   },
   "plugins": {
     "shell": {

@@ -8,7 +8,7 @@ pub fn App() -> impl IntoView {
     init_theme();
 
     view! {
-        <div class="h-screen flex flex-col bg-white dark:bg-[#1a1a2e] text-[#1a1a2e] dark:text-[#e0e0e0]">
+        <div class="h-screen flex flex-col bg-background text-foreground">
             <BrowsePage />
         </div>
     }

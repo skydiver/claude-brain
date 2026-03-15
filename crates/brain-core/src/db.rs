@@ -203,7 +203,6 @@ impl Database {
         if sanitized.is_empty() {
             return Ok(Vec::new());
         }
-
         let mut sql = String::from(
             "SELECT e.id, e.type, e.title, e.content, e.technology, e.project, e.tags, e.source,
                     e.created_at, e.updated_at, entries_fts.rank
@@ -244,6 +243,58 @@ impl Database {
             .collect::<Result<Vec<_>, _>>()?;
 
         Ok(results)
+    }
+
+    /// Simple LIKE-based search for interactive search-as-you-type UIs.
+    /// Matches substring anywhere in title, content, technology, or tags.
+    pub fn search_like(
+        &self,
+        query: &str,
+        entry_type: Option<&EntryType>,
+        technology: Option<&str>,
+        limit: u32,
+    ) -> Result<(Vec<Entry>, u64), BrainError> {
+        let query = query.trim();
+        if query.is_empty() {
+            return Ok((Vec::new(), 0));
+        }
+        let pattern = format!("%{query}%");
+
+        let mut sql = String::from(
+            "SELECT id, type, title, content, technology, project, tags, source, created_at, updated_at
+             FROM entries
+             WHERE (title LIKE ?1 OR content LIKE ?1 OR technology LIKE ?1 OR tags LIKE ?1)",
+        );
+        let mut params_vec: Vec<Box<dyn rusqlite::types::ToSql>> = Vec::new();
+        params_vec.push(Box::new(pattern));
+
+        if let Some(et) = entry_type {
+            sql.push_str(" AND type = ?");
+            params_vec.push(Box::new(et.as_str().to_string()));
+        }
+        if let Some(tech) = technology {
+            sql.push_str(" AND technology = ?");
+            params_vec.push(Box::new(tech.to_string()));
+        }
+
+        let count_sql = format!("SELECT COUNT(*) FROM ({sql})");
+        sql.push_str(" ORDER BY updated_at DESC LIMIT ?");
+        params_vec.push(Box::new(limit));
+
+        let params_refs: Vec<&dyn rusqlite::types::ToSql> =
+            params_vec.iter().map(|v| v.as_ref()).collect();
+
+        let total: u64 = {
+            let count_params = &params_refs[..params_refs.len() - 1];
+            self.conn.query_row(&count_sql, count_params, |row| row.get(0))?
+        };
+
+        let mut stmt = self.conn.prepare(&sql)?;
+        let entries = stmt
+            .query_map(params_refs.as_slice(), |row| Ok(row_to_entry(row)))?
+            .collect::<Result<Vec<_>, _>>()?;
+
+        Ok((entries, total))
     }
 
     pub fn get_project_context(&self, project_path: &str) -> Result<Vec<Entry>, BrainError> {

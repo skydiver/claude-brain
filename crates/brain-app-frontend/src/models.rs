@@ -9,23 +9,6 @@ pub enum EntryType {
     Gotcha,
 }
 
-impl EntryType {
-    pub fn label(&self) -> &'static str {
-        match self {
-            EntryType::Learning => "Learning",
-            EntryType::ProjectContext => "Project Context",
-            EntryType::Gotcha => "Gotcha",
-        }
-    }
-
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            EntryType::Learning => "learning",
-            EntryType::ProjectContext => "project_context",
-            EntryType::Gotcha => "gotcha",
-        }
-    }
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Entry {
@@ -69,18 +52,6 @@ impl Entry {
 pub struct SearchResponse {
     pub entries: Vec<Entry>,
     pub total: usize,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct FtsEntry {
-    #[serde(flatten)]
-    pub entry: Entry,
-    pub rank: f64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct FtsResponse {
-    pub entries: Vec<FtsEntry>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

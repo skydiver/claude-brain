@@ -2,24 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
+/* rust-ui / shadcn theme variables */
 :root {
+  --background: #ffffff;
+  --foreground: #1a1a2e;
+  --card: #ffffff;
+  --card-foreground: #1a1a2e;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a2e;
+  --primary: #1565c0;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #334155;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #f1f5f9;
+  --accent-foreground: #1565c0;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #1565c0;
+  --radius: 0.5rem;
+
+  /* app-specific */
   --color-surface: #f8f9fa;
   --color-accent: #1565c0;
   --color-type-learning: #1e88e5;
   --color-type-gotcha: #f57c00;
   --color-type-project: #2e7d32;
+
+  --success-light: #dcfce7;
+  --success-dark: #166534;
+  --warning-light: #fef3c7;
+  --warning-dark: #92400e;
+  --info-light: #dbeafe;
+  --info-dark: #1e40af;
 }
 
 .dark {
+  --background: #1a1a2e;
+  --foreground: #e0e0e0;
+  --card: #16213e;
+  --card-foreground: #e0e0e0;
+  --popover: #16213e;
+  --popover-foreground: #e0e0e0;
+  --primary: #4fc3f7;
+  --primary-foreground: #0a0a1a;
+  --secondary: #1e293b;
+  --secondary-foreground: #cbd5e1;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #4fc3f7;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #334155;
+  --input: #334155;
+  --ring: #4fc3f7;
+
+  /* app-specific */
   --color-surface: #16213e;
   --color-accent: #4fc3f7;
   --color-type-learning: #42a5f5;
   --color-type-gotcha: #ffa726;
   --color-type-project: #66bb6a;
+
+  --success-light: #166534;
+  --success-dark: #dcfce7;
+  --warning-light: #92400e;
+  --warning-dark: #fef3c7;
+  --info-light: #1e40af;
+  --info-dark: #dbeafe;
+}
+
+/* Hide scrollbars — content still scrolls via trackpad/wheel */
+::-webkit-scrollbar {
+  display: none;
 }
 
 body {
-  @apply bg-white dark:bg-[#1a1a2e] text-[#1a1a2e] dark:text-[#e0e0e0];
+  @apply bg-background text-foreground;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   margin: 0;
