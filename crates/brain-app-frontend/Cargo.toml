@@ -32,7 +32,6 @@ leptos_ui = "0.3"
 tw_merge = "0.1"
 leptos_icons = "0.7"
 icondata = "0.7"
-strum = "0.28.0"
 
 [package.metadata.leptos]
 tailwind-input-file = "styles/main.css"

@@ -9,6 +9,8 @@ mod models;
 #[cfg(target_arch = "wasm32")]
 mod pages;
 #[cfg(target_arch = "wasm32")]
+mod settings;
+#[cfg(target_arch = "wasm32")]
 mod theme;
 
 #[cfg(target_arch = "wasm32")]

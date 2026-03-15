@@ -7,6 +7,7 @@ mod components {
     clx! {SwitchLabel, span, "text-sm font-medium"}
 }
 
+#[allow(unused_imports)]
 pub use components::*;
 
 #[component]

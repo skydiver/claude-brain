@@ -2,17 +2,26 @@ use leptos::context::Provider;
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use leptos_ui::clx;
-use strum::{AsRefStr, Display};
 use tw_merge::*;
 
 use crate::components::hooks::use_can_scroll_vertical::use_can_scroll_vertical;
 use crate::components::hooks::use_random::use_random_id_for;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Display, AsRefStr)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[allow(dead_code)]
 pub enum SelectPosition {
     #[default]
     Below,
     Above,
+}
+
+impl std::fmt::Display for SelectPosition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SelectPosition::Below => write!(f, "Below"),
+            SelectPosition::Above => write!(f, "Above"),
+        }
+    }
 }
 
 mod components {
@@ -21,6 +30,7 @@ mod components {
     clx! {SelectItem, li, "inline-flex gap-2 items-center w-full rounded-sm px-2 py-1.5 text-sm no-underline transition-colors duration-200 text-popover-foreground hover:bg-accent hover:text-accent-foreground [&_svg:not([class*='size-'])]:size-4"}
 }
 
+#[allow(unused_imports)]
 pub use components::*;
 
 #[component]
@@ -50,7 +60,7 @@ pub fn SelectValue(#[prop(optional, into)] placeholder: String) -> impl IntoView
 }
 
 /* ========================================================== */
-/*                     ✨ FUNCTIONS ✨                        */
+/*                     FUNCTIONS                              */
 /* ========================================================== */
 
 #[component]
@@ -87,13 +97,15 @@ pub fn SelectOption(
             }
         >
             {children()}
-            <Icon icon=icondata::LuCheck class="ml-auto opacity-0 size-4 text-muted-foreground group-aria-selected:opacity-100" />
+            <span class="ml-auto opacity-0 size-4 text-muted-foreground group-aria-selected:opacity-100">
+                <Icon icon=icondata::LuCheck />
+            </span>
         </li>
     }
 }
 
 /* ========================================================== */
-/*                     ✨ FUNCTIONS ✨                        */
+/*                     FUNCTIONS                              */
 /* ========================================================== */
 
 #[derive(Clone)]
@@ -154,7 +166,9 @@ pub fn SelectTrigger(
             data-select-trigger=ctx.target_id
         >
             {children()}
-            <Icon icon=icondata::LuChevronDown class="text-muted-foreground" />
+            <span class="text-muted-foreground">
+                <Icon icon=icondata::LuChevronDown />
+            </span>
         </button>
     }
 }
@@ -200,7 +214,9 @@ pub fn SelectContent(
                     }
                 }
             >
-                <Icon icon=icondata::LuChevronUp class="size-4 text-muted-foreground" />
+                <span class="size-4 text-muted-foreground">
+                    <Icon icon=icondata::LuChevronUp />
+                </span>
             </div>
             {children()}
             <div
@@ -213,7 +229,9 @@ pub fn SelectContent(
                     }
                 }
             >
-                <ChevronDown class="size-4 text-muted-foreground" />
+                <span class="size-4 text-muted-foreground">
+                    <Icon icon=icondata::LuChevronDown />
+                </span>
             </div>
         </div>
 
