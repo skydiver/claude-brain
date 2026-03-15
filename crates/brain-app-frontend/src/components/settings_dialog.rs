@@ -3,9 +3,6 @@ use leptos_icons::Icon;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 
-use crate::components::ui::select::{
-    Select, SelectContent, SelectGroup, SelectOption, SelectTrigger, SelectValue,
-};
 use crate::models::Theme;
 use crate::settings::SettingsContext;
 
@@ -36,25 +33,18 @@ pub fn SettingsDialog() -> impl IntoView {
         closure.forget();
     }
 
-    // Theme change handler
-    let on_theme_change = Callback::new(move |value: Option<String>| {
-        let Some(theme_str) = value else { return };
-        let theme = match theme_str.as_str() {
-            "default-dark" => Theme::DefaultDark,
-            "default-light" => Theme::DefaultLight,
-            _ => Theme::System,
-        };
-        let mut settings = ctx.settings.get_untracked();
-        settings.appearance.theme = theme;
-        ctx.update(settings);
-    });
-
     let current_theme_value = move || match ctx.settings.get().appearance.theme {
         Theme::System => "system",
         Theme::DefaultDark => "default-dark",
         Theme::DefaultLight => "default-light",
     }
     .to_string();
+
+    let on_theme_change = Callback::new(move |theme: Theme| {
+        let mut settings = ctx.settings.get_untracked();
+        settings.appearance.theme = theme;
+        ctx.update(settings);
+    });
 
     view! {
         // Trigger button — matches titlebar button style exactly
@@ -148,25 +138,10 @@ pub fn SettingsDialog() -> impl IntoView {
                                         "Choose the app color scheme"
                                     </div>
                                 </div>
-                                <Select
-                                    default_value=current_theme_value()
+                                <ThemeSelect
+                                    value=Signal::derive(current_theme_value)
                                     on_change=on_theme_change
-                                >
-                                    <SelectTrigger class="w-[160px]">
-                                        <SelectValue placeholder="Select theme" />
-                                    </SelectTrigger>
-                                    <SelectContent class="w-[160px]">
-                                        <SelectGroup>
-                                            <SelectOption value="system">"System"</SelectOption>
-                                            <SelectOption value="default-dark">
-                                                "Default Dark"
-                                            </SelectOption>
-                                            <SelectOption value="default-light">
-                                                "Default Light"
-                                            </SelectOption>
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
+                                />
                             </div>
 
                         </Show>
@@ -175,5 +150,79 @@ pub fn SettingsDialog() -> impl IntoView {
             </div>
             </div>
         </Show>
+    }
+}
+
+#[component]
+fn ThemeSelect(
+    value: Signal<String>,
+    on_change: Callback<Theme>,
+) -> impl IntoView {
+    let (dropdown_open, set_dropdown_open) = signal(false);
+
+    let display_label = move || match value.get().as_str() {
+        "default-dark" => "Default Dark",
+        "default-light" => "Default Light",
+        _ => "System",
+    };
+
+    let make_option = move |val: &'static str, label: &'static str, theme: Theme| {
+        let is_selected = move || value.get() == val;
+        view! {
+            <button
+                type="button"
+                class=move || format!(
+                    "w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm transition-colors {}",
+                    if is_selected() {
+                        "bg-accent text-accent-foreground"
+                    } else {
+                        "text-popover-foreground hover:bg-accent hover:text-accent-foreground"
+                    }
+                )
+                on:click={
+                    let theme = theme.clone();
+                    move |e: web_sys::MouseEvent| {
+                        e.stop_propagation();
+                        on_change.run(theme.clone());
+                        set_dropdown_open.set(false);
+                    }
+                }
+            >
+                <span class=move || if is_selected() { "size-4" } else { "size-4 opacity-0" }>
+                    <Icon icon=icondata::LuCheck />
+                </span>
+                {label}
+            </button>
+        }
+    };
+
+    view! {
+        <div class="relative w-[160px]">
+            <button
+                type="button"
+                class="w-full h-9 px-3 inline-flex items-center justify-between text-sm rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
+                on:click=move |e: web_sys::MouseEvent| {
+                    e.stop_propagation();
+                    set_dropdown_open.update(|v| *v = !*v);
+                }
+            >
+                <span class="truncate">{display_label}</span>
+                <span class="size-4 text-muted-foreground">
+                    <Icon icon=icondata::LuChevronDown />
+                </span>
+            </button>
+
+            <Show when=move || dropdown_open.get()>
+                <div
+                    class="fixed inset-0 z-[90]"
+                    on:mousedown=move |_| set_dropdown_open.set(false)
+                />
+                <div class="absolute top-[calc(100%+4px)] left-0 w-full z-[100] p-1 rounded-md border border-border bg-card shadow-md">
+                    {make_option("system", "System", Theme::System)}
+                    {make_option("default-dark", "Default Dark", Theme::DefaultDark)}
+                    {make_option("default-light", "Default Light", Theme::DefaultLight)}
+                </div>
+            </Show>
+        </div>
     }
 }
