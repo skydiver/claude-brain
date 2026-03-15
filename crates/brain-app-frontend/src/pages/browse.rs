@@ -271,7 +271,64 @@ pub fn BrowsePage() -> impl IntoView {
 
     view! {
         <div class="flex flex-col h-screen">
-            // Top bar: search + refresh
+            // Titlebar (draggable, overlays native titlebar)
+            {
+                let titlebar_ref = NodeRef::<leptos::html::Div>::new();
+                Effect::new(move || {
+                    if let Some(el) = titlebar_ref.get() {
+                        use wasm_bindgen::closure::Closure;
+                        use wasm_bindgen::JsCast;
+
+                        let closure = Closure::wrap(Box::new(move |e: web_sys::MouseEvent| {
+                            // Don't drag if clicking a button
+                            if let Some(target) = e.target() {
+                                if let Some(el) = target.dyn_ref::<web_sys::HtmlElement>() {
+                                    if el.closest("button").ok().flatten().is_some() {
+                                        return;
+                                    }
+                                }
+                            }
+                            if e.buttons() == 1 {
+                                // Call Tauri's startDragging via JS interop
+                                if let Some(window) = web_sys::window() {
+                                    if let Ok(tauri) = js_sys::Reflect::get(&window, &"__TAURI__".into()) {
+                                        if let Ok(win_mod) = js_sys::Reflect::get(&tauri, &"window".into()) {
+                                            if let Ok(get_current) = js_sys::Reflect::get(&win_mod, &"getCurrentWindow".into()) {
+                                                if let Ok(get_fn) = get_current.dyn_into::<js_sys::Function>() {
+                                                    if let Ok(app_win) = get_fn.call0(&wasm_bindgen::JsValue::NULL) {
+                                                        if let Ok(drag_fn) = js_sys::Reflect::get(&app_win, &"startDragging".into()) {
+                                                            if let Ok(drag) = drag_fn.dyn_into::<js_sys::Function>() {
+                                                                let _ = drag.call0(&app_win);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }) as Box<dyn FnMut(_)>);
+
+                        let _ = el.add_event_listener_with_callback(
+                            "mousedown",
+                            closure.as_ref().unchecked_ref(),
+                        );
+                        closure.forget();
+                    }
+                });
+
+                view! {
+                    <div
+                        node_ref=titlebar_ref
+                        class="h-[38px] shrink-0 border-b border-border flex items-center pl-[90px] select-none cursor-default"
+                    >
+                        <span class="text-xs font-semibold text-muted-foreground">"ClaudeBrain"</span>
+                    </div>
+                }
+            }
+
+            // Search bar
             <div class="p-3 border-b border-border flex items-center gap-2">
                 <SearchBar value=search_query on_search=on_search />
                 <Button
