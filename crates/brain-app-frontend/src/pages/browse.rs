@@ -358,13 +358,13 @@ pub fn BrowsePage() -> impl IntoView {
                 view! {
                     <div
                         node_ref=titlebar_ref
-                        class="h-[38px] shrink-0 border-b border-border flex items-center pl-[90px] select-none cursor-default"
+                        class="h-[38px] shrink-0 border-b border-border flex items-center pl-[90px] pr-3 select-none cursor-default"
                     >
                         <span class="text-xs font-semibold text-muted-foreground">"ClaudeBrain"</span>
                         <div class="mx-3 h-4 w-px bg-border"></div>
                         <button
                             class=move || format!(
-                                "p-1 rounded transition-colors {}",
+                                "p-1 rounded transition-colors mr-auto {}",
                                 if sidebar_visible.get() { "bg-muted text-foreground" } else { "text-muted-foreground hover:bg-muted" }
                             )
                             title="Toggle filters"
@@ -380,6 +380,16 @@ pub fn BrowsePage() -> impl IntoView {
                             }
                         >
                             <span class="size-3.5"><Icon icon=icondata::LuPanelLeft /></span>
+                        </button>
+                        <button
+                            class="p-1 rounded text-muted-foreground hover:bg-muted transition-colors"
+                            title="Refresh"
+                            on:click=move |e: web_sys::MouseEvent| {
+                                e.stop_propagation();
+                                on_refresh.run(());
+                            }
+                        >
+                            <span class="size-3.5"><Icon icon=icondata::LuRefreshCw /></span>
                         </button>
                     </div>
                 }
@@ -410,7 +420,6 @@ pub fn BrowsePage() -> impl IntoView {
                     on_load_more=on_load_more
                     search_value=search_query
                     on_search=on_search
-                    on_refresh=on_refresh
                 />
                 <EntryDetail
                     entry=selected_entry

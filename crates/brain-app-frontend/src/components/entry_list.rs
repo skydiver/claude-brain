@@ -5,7 +5,6 @@ use crate::components::type_icon::TypeIcon;
 use crate::components::ui::button::{Button, ButtonSize, ButtonVariant};
 use crate::components::ui::scroll_area::ScrollArea;
 use crate::models::Entry;
-use leptos_icons::Icon;
 
 #[component]
 pub fn EntryList(
@@ -16,7 +15,6 @@ pub fn EntryList(
     on_load_more: Callback<()>,
     search_value: ReadSignal<String>,
     on_search: Callback<String>,
-    on_refresh: Callback<()>,
 ) -> impl IntoView {
     let has_more = move || entries.get().len() < total.get();
     let showing_text = move || {
@@ -31,17 +29,9 @@ pub fn EntryList(
 
     view! {
         <div class="w-[280px] min-w-[280px] border-r border-border flex flex-col bg-card">
-            // Search bar + refresh
-            <div class="p-2 border-b border-border flex items-center gap-1">
+            // Search bar
+            <div class="p-2 border-b border-border">
                 <SearchBar value=search_value on_search=on_search />
-                <Button
-                    variant=ButtonVariant::Ghost
-                    size=ButtonSize::Icon
-                    class="shrink-0 size-8"
-                    on:click=move |_| on_refresh.run(())
-                >
-                    <span class="size-3.5"><Icon icon=icondata::LuRefreshCw /></span>
-                </Button>
             </div>
 
             <ScrollArea class="flex-1">
