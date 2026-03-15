@@ -76,6 +76,11 @@
   --info-dark: #dbeafe;
 }
 
+/* Hide scrollbars — content still scrolls via trackpad/wheel */
+::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   @apply bg-background text-foreground;
   font-family:

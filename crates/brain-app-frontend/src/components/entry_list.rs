@@ -59,7 +59,7 @@ pub fn EntryList(
                                 <div
                                     class=move || format!(
                                         "p-3 border-b border-border cursor-pointer transition-colors {}",
-                                        if is_selected() { "bg-primary/10 border-l-2 border-l-primary" } else { "hover:bg-muted/50" }
+                                        if is_selected() { "bg-muted" } else { "hover:bg-muted/50" }
                                     )
                                     on:click=move |_| on_select.run(id)
                                 >
