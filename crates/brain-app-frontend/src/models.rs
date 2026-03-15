@@ -55,18 +55,6 @@ pub struct SearchResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct FtsEntry {
-    #[serde(flatten)]
-    pub entry: Entry,
-    pub rank: f64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct FtsResponse {
-    pub entries: Vec<FtsEntry>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Stats {
     pub total: u64,
     pub by_type: HashMap<String, u64>,

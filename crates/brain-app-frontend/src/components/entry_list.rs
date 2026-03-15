@@ -1,5 +1,6 @@
 use leptos::prelude::*;
 
+use crate::components::search_bar::SearchBar;
 use crate::components::type_icon::TypeIcon;
 use crate::components::ui::button::{Button, ButtonSize, ButtonVariant};
 use crate::components::ui::scroll_area::ScrollArea;
@@ -12,6 +13,9 @@ pub fn EntryList(
     selected_id: Memo<Option<i64>>,
     on_select: Callback<i64>,
     on_load_more: Callback<()>,
+    search_value: ReadSignal<String>,
+    on_search: Callback<String>,
+    on_refresh: Callback<()>,
 ) -> impl IntoView {
     let has_more = move || entries.get().len() < total.get();
     let showing_text = move || {
@@ -26,6 +30,21 @@ pub fn EntryList(
 
     view! {
         <div class="w-[280px] min-w-[280px] border-r border-border flex flex-col bg-card">
+            // Search bar + refresh
+            <div class="p-2 border-b border-border flex items-center gap-1">
+                <SearchBar value=search_value on_search=on_search />
+                <Button
+                    variant=ButtonVariant::Ghost
+                    size=ButtonSize::Icon
+                    class="shrink-0 size-8"
+                    on:click=move |_| on_refresh.run(())
+                >
+                    <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                </Button>
+            </div>
+
             <ScrollArea class="flex-1">
                 <Show
                     when=move || !entries.get().is_empty()

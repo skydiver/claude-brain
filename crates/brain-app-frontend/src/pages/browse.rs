@@ -6,9 +6,7 @@ use wasm_bindgen_futures::spawn_local;
 use crate::api;
 use crate::components::entry_detail::EntryDetail;
 use crate::components::entry_list::EntryList;
-use crate::components::search_bar::SearchBar;
 use crate::components::sidebar::Sidebar;
-use crate::components::ui::button::{Button, ButtonSize, ButtonVariant};
 use crate::models::{Entry, Stats};
 
 const PAGE_SIZE: u32 = 20;
@@ -53,14 +51,10 @@ pub fn BrowsePage() -> impl IntoView {
 
         spawn_local(async move {
             if !query.is_empty() {
-                // FTS search mode
-                match api::search_entries(query, entry_type, tech, None, Some(PAGE_SIZE)).await {
+                match api::search_entries(query, entry_type, tech, Some(PAGE_SIZE)).await {
                     Ok(resp) => {
-                        let search_entries: Vec<Entry> =
-                            resp.entries.into_iter().map(|fe| fe.entry).collect();
-                        let len = search_entries.len();
-                        set_entries.set(search_entries);
-                        set_total.set(len); // FTS doesn't return a total
+                        set_entries.set(resp.entries);
+                        set_total.set(resp.total);
                     }
                     Err(_) => {
                         set_entries.set(vec![]);
@@ -97,21 +91,50 @@ pub fn BrowsePage() -> impl IntoView {
 
     // Trigger fetch on any filter change
     Effect::new(move || {
-        let _ = search_query.get();
-        let _ = selected_type.get();
-        let _ = selected_technology.get();
-        let _ = selected_tags.get();
+        // Track all filter signals so this re-runs when any changes
+        let query = search_query.get();
+        let entry_type = selected_type.get();
+        let tech = selected_technology.get();
+        let tag_list = selected_tags.get();
+
+        // Reset pagination on filter change
         set_offset.set(0);
-        fetch_entries();
+
+        // Fetch with current values directly (not via closure that re-reads signals)
+        spawn_local(async move {
+            if !query.is_empty() {
+                match api::search_entries(query, entry_type, tech, Some(PAGE_SIZE)).await {
+                    Ok(resp) => {
+                        set_entries.set(resp.entries);
+                        set_total.set(resp.total);
+                    }
+                    Err(_) => {
+                        set_entries.set(vec![]);
+                        set_total.set(0);
+                    }
+                }
+            } else {
+                let tags_str = if tag_list.is_empty() {
+                    None
+                } else {
+                    Some(tag_list.join(","))
+                };
+                match api::list_entries(entry_type, tech, tags_str, Some(PAGE_SIZE), Some(0)).await {
+                    Ok(resp) => {
+                        set_entries.set(resp.entries);
+                        set_total.set(resp.total);
+                    }
+                    Err(_) => {
+                        set_entries.set(vec![]);
+                        set_total.set(0);
+                    }
+                }
+            }
+        });
     });
 
     // Search callback
     let on_search = Callback::new(move |query: String| {
-        if !query.is_empty() {
-            set_selected_type.set(None);
-            set_selected_technology.set(None);
-            set_selected_tags.set(vec![]);
-        }
         set_search_query.set(query);
     });
 
@@ -128,6 +151,22 @@ pub fn BrowsePage() -> impl IntoView {
     let on_load_more = Callback::new(move |_: ()| {
         set_offset.set(offset.get_untracked() + PAGE_SIZE);
         fetch_entries();
+    });
+
+    // Refresh all data
+    let on_refresh = Callback::new(move |_: ()| {
+        fetch_entries();
+        spawn_local(async move {
+            if let Ok(techs) = api::list_technologies().await {
+                set_technologies.set(techs);
+            }
+            if let Ok(t) = api::list_tags().await {
+                set_tags.set(t);
+            }
+            if let Ok(s) = api::fetch_stats().await {
+                set_stats.set(Some(s));
+            }
+        });
     });
 
     // Tag click from detail → add to filters
@@ -244,18 +283,7 @@ pub fn BrowsePage() -> impl IntoView {
         let closure = Closure::wrap(Box::new(move |_: web_sys::Event| {
             if let Some(doc) = web_sys::window().and_then(|w| w.document()) {
                 if doc.visibility_state() == web_sys::VisibilityState::Visible {
-                    fetch_entries();
-                    spawn_local(async move {
-                        if let Ok(techs) = api::list_technologies().await {
-                            set_technologies.set(techs);
-                        }
-                        if let Ok(t) = api::list_tags().await {
-                            set_tags.set(t);
-                        }
-                        if let Ok(s) = api::fetch_stats().await {
-                            set_stats.set(Some(s));
-                        }
-                    });
+                    on_refresh.run(());
                 }
             }
         }) as Box<dyn FnMut(_)>);
@@ -328,34 +356,6 @@ pub fn BrowsePage() -> impl IntoView {
                 }
             }
 
-            // Search bar
-            <div class="p-3 border-b border-border flex items-center gap-2">
-                <SearchBar value=search_query on_search=on_search />
-                <Button
-                    variant=ButtonVariant::Ghost
-                    size=ButtonSize::Icon
-                    class="shrink-0"
-                    on:click=move |_| {
-                        fetch_entries();
-                        spawn_local(async move {
-                            if let Ok(techs) = api::list_technologies().await {
-                                set_technologies.set(techs);
-                            }
-                            if let Ok(t) = api::list_tags().await {
-                                set_tags.set(t);
-                            }
-                            if let Ok(s) = api::fetch_stats().await {
-                                set_stats.set(Some(s));
-                            }
-                        });
-                    }
-                >
-                    <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                    </svg>
-                </Button>
-            </div>
-
             // Three-pane layout
             <div class="flex flex-1 min-h-0">
                 <Sidebar
@@ -374,6 +374,9 @@ pub fn BrowsePage() -> impl IntoView {
                     selected_id=selected_id
                     on_select=on_select_entry
                     on_load_more=on_load_more
+                    search_value=search_query
+                    on_search=on_search
+                    on_refresh=on_refresh
                 />
                 <EntryDetail
                     entry=selected_entry
