@@ -69,7 +69,7 @@ pub fn EntryDetail(
 
                                 // Rendered content
                                 <div
-                                    class="prose prose-sm dark:prose-invert max-w-none mt-4 overflow-hidden [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto"
+                                    class="prose prose-sm max-w-none mt-4 overflow-hidden [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto"
                                     inner_html=rendered_content
                                 />
 

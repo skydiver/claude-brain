@@ -1,6 +1,6 @@
 .theme-nord {
   --background: #2e3440;
-  --foreground: #d8dee9;
+  --foreground: #e5e9f0;
   --card: #3b4252;
   --card-foreground: #e5e9f0;
   --popover: #3b4252;
@@ -9,8 +9,8 @@
   --primary-foreground: #2e3440;
   --secondary: #3b4252;
   --secondary-foreground: #e5e9f0;
-  --muted: #3b4252;
-  --muted-foreground: #7b88a1;
+  --muted: #434c5e;
+  --muted-foreground: #8892a8;
   --accent: #3b4252;
   --accent-foreground: #88c0d0;
   --destructive: #bf616a;

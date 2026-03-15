@@ -1,6 +1,6 @@
 .theme-solarized-dark {
   --background: #002b36;
-  --foreground: #839496;
+  --foreground: #93a1a1;
   --card: #073642;
   --card-foreground: #93a1a1;
   --popover: #073642;
@@ -9,8 +9,8 @@
   --primary-foreground: #fdf6e3;
   --secondary: #073642;
   --secondary-foreground: #93a1a1;
-  --muted: #073642;
-  --muted-foreground: #657b83;
+  --muted: #0a4050;
+  --muted-foreground: #839496;
   --accent: #073642;
   --accent-foreground: #268bd2;
   --destructive: #dc322f;
