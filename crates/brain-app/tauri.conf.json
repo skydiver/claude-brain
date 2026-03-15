@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "identifier": "com.claude-brain.desktop",
   "build": {
-    "frontendDist": "../brain-app-frontend/dist"
+    "frontendDist": "../brain-app-frontend/dist",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "cd brain-app-frontend && trunk serve --port 1420"
   },
   "app": {
     "withGlobalTauri": true,

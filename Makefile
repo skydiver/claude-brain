@@ -27,7 +27,7 @@ brain-app: frontend
 	@mkdir -p $(DIST)
 	cp -R target/release/bundle/macos/ClaudeBrain.app $(DIST)/
 
-# Run the desktop app in dev mode
+# Run the desktop app in dev mode (Tauri manages trunk via beforeDevCommand)
 dev:
 	cd crates/brain-app && cargo tauri dev
 
