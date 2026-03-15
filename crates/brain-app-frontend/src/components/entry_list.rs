@@ -1,6 +1,8 @@
 use leptos::prelude::*;
 
 use crate::components::type_icon::TypeIcon;
+use crate::components::ui::button::{Button, ButtonSize, ButtonVariant};
+use crate::components::ui::scroll_area::ScrollArea;
 use crate::models::Entry;
 
 #[component]
@@ -23,13 +25,13 @@ pub fn EntryList(
     };
 
     view! {
-        <div class="w-[280px] min-w-[280px] border-r border-gray-200 dark:border-gray-700 flex flex-col">
-            <div class="flex-1 overflow-y-auto">
+        <div class="w-[280px] min-w-[280px] border-r border-border flex flex-col bg-card">
+            <ScrollArea class="flex-1">
                 <Show
                     when=move || !entries.get().is_empty()
                     fallback=|| view! {
-                        <div class="p-4 text-center text-gray-400 text-sm">
-                            <p>"No entries found"</p>
+                        <div class="p-6 text-center text-muted-foreground text-sm">
+                            <p class="font-medium">"No entries found"</p>
                             <p class="mt-1 text-xs">"Try broadening your search or filters"</p>
                         </div>
                     }
@@ -48,36 +50,38 @@ pub fn EntryList(
                             view! {
                                 <div
                                     class=move || format!(
-                                        "p-3 border-b border-gray-100 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1a1a3e] {}",
-                                        if is_selected() { "bg-accent/10" } else { "" }
+                                        "p-3 border-b border-border cursor-pointer transition-colors {}",
+                                        if is_selected() { "bg-primary/10 border-l-2 border-l-primary" } else { "hover:bg-muted/50" }
                                     )
                                     on:click=move |_| on_select.run(id)
                                 >
                                     <div class="flex items-center gap-2 mb-1">
                                         <TypeIcon entry_type=entry_type />
                                         <Show when=move || !tech_for_check.is_empty()>
-                                            <span class="text-xs text-gray-400">{tech.clone()}</span>
+                                            <span class="text-xs text-muted-foreground">{tech.clone()}</span>
                                         </Show>
                                     </div>
-                                    <h4 class="text-sm font-medium truncate">{entry.title.clone()}</h4>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">{preview}</p>
+                                    <h4 class="text-sm font-medium truncate text-foreground">{entry.title.clone()}</h4>
+                                    <p class="text-xs text-muted-foreground mt-0.5 line-clamp-2">{preview}</p>
                                 </div>
                             }
                         }
                     />
                 </Show>
-            </div>
+            </ScrollArea>
 
             // Footer with count and load-more
-            <div class="p-2 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 text-center">
+            <div class="p-2 border-t border-border text-xs text-muted-foreground text-center">
                 <span>{showing_text}</span>
                 <Show when=has_more>
-                    <button
-                        class="ml-2 text-accent hover:underline"
+                    <Button
+                        variant=ButtonVariant::Link
+                        size=ButtonSize::Sm
+                        class="ml-1 h-auto p-0 text-xs"
                         on:click=move |_| on_load_more.run(())
                     >
                         "Load more"
-                    </button>
+                    </Button>
                 </Show>
             </div>
         </div>

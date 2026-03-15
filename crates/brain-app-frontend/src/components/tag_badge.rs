@@ -1,5 +1,7 @@
 use leptos::prelude::*;
 
+use crate::components::ui::badge::{Badge, BadgeVariant};
+
 #[component]
 pub fn TagBadge(
     tag: String,
@@ -12,17 +14,14 @@ pub fn TagBadge(
 
     view! {
         <span
-            class=move || format!(
-                "inline-flex items-center px-2 py-0.5 rounded text-xs bg-accent/10 text-accent {}",
-                if clickable { "cursor-pointer hover:bg-accent/20" } else { "" }
-            )
+            class=move || if clickable { "cursor-pointer" } else { "" }
             on:click=move |_| {
                 if let Some(ref cb) = on_click_cb {
                     cb.run(tag_for_click.clone());
                 }
             }
         >
-            {tag_for_display}
+            <Badge variant=BadgeVariant::Outline>{tag_for_display}</Badge>
         </span>
     }
 }

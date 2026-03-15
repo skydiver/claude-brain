@@ -8,6 +8,7 @@ use crate::components::entry_detail::EntryDetail;
 use crate::components::entry_list::EntryList;
 use crate::components::search_bar::SearchBar;
 use crate::components::sidebar::Sidebar;
+use crate::components::ui::button::{Button, ButtonSize, ButtonVariant};
 use crate::models::{Entry, Stats};
 
 const PAGE_SIZE: u32 = 20;
@@ -271,13 +272,12 @@ pub fn BrowsePage() -> impl IntoView {
     view! {
         <div class="flex flex-col h-screen">
             // Top bar: search + refresh
-            <div class="p-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
-                <div class="flex-1">
-                    <SearchBar value=search_query on_search=on_search />
-                </div>
-                <button
-                    class="p-2 text-gray-400 hover:text-accent rounded"
-                    title="Refresh"
+            <div class="p-3 border-b border-border flex items-center gap-2">
+                <SearchBar value=search_query on_search=on_search />
+                <Button
+                    variant=ButtonVariant::Ghost
+                    size=ButtonSize::Icon
+                    class="shrink-0"
                     on:click=move |_| {
                         fetch_entries();
                         spawn_local(async move {
@@ -293,8 +293,10 @@ pub fn BrowsePage() -> impl IntoView {
                         });
                     }
                 >
-                    "⟳"
-                </button>
+                    <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                </Button>
             </div>
 
             // Three-pane layout
@@ -324,7 +326,7 @@ pub fn BrowsePage() -> impl IntoView {
             </div>
 
             // Bottom stats bar
-            <div class="px-4 py-1.5 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 flex justify-between">
+            <div class="px-4 py-1.5 border-t border-border text-xs text-muted-foreground flex justify-between bg-card">
                 <span>{stats_text}</span>
                 <span class="font-mono">"brain.db"</span>
             </div>

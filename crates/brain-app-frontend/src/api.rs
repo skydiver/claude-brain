@@ -106,16 +106,6 @@ pub async fn get_entry(id: i64) -> Result<Entry, String> {
     invoke("get_entry", GetEntryArgs { id }).await
 }
 
-#[derive(Serialize)]
-struct ProjectContextArgs {
-    #[serde(rename = "projectPath")]
-    project_path: String,
-}
-
-pub async fn get_project_context(project_path: String) -> Result<SearchResponse, String> {
-    invoke("get_project_context", ProjectContextArgs { project_path }).await
-}
-
 pub async fn list_technologies() -> Result<Vec<String>, String> {
     invoke("list_technologies", serde_json::json!({})).await
 }

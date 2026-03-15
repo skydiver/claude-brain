@@ -1,7 +1,10 @@
 [package]
 name = "brain-app-frontend"
-version = "0.1.0"
-edition = "2024"
+description = "Leptos WASM frontend for the claude-brain desktop app"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [[bin]]
 name = "brain-app-frontend"
@@ -25,3 +28,8 @@ web-sys = { version = "0.3", features = [
     "VisibilityState", "KeyboardEvent", "Event",
 ] }
 pulldown-cmark = { version = "0.12", default-features = false, features = ["html"] }
+leptos_ui = "0.3"
+tw_merge = "0.1"
+
+[package.metadata.leptos]
+tailwind-input-file = "styles/main.css"
