@@ -23,8 +23,8 @@ pub use components::*;
 /* ========================================================== */
 
 #[derive(Clone)]
-struct DialogContext {
-    target_id: String,
+pub struct DialogContext {
+    pub target_id: String,
 }
 
 #[component]
