@@ -16,6 +16,7 @@ mod components {
     clx! {DialogFooter, footer, "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"}
 }
 
+#[allow(unused_imports)]
 pub use components::*;
 
 /* ========================================================== */

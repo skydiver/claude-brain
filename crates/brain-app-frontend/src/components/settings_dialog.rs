@@ -6,8 +6,6 @@ use wasm_bindgen::JsCast;
 use crate::components::ui::select::{
     Select, SelectContent, SelectGroup, SelectOption, SelectTrigger, SelectValue,
 };
-use crate::components::ui::separator::Separator;
-use crate::components::ui::switch::Switch;
 use crate::models::Theme;
 use crate::settings::SettingsContext;
 
@@ -42,13 +40,6 @@ pub fn SettingsDialog() -> impl IntoView {
         };
         let mut settings = ctx.settings.get_untracked();
         settings.appearance.theme = theme;
-        ctx.update(settings);
-    });
-
-    // Sidebar toggle handler
-    let on_sidebar_toggle = Callback::new(move |checked: bool| {
-        let mut settings = ctx.settings.get_untracked();
-        settings.appearance.sidebar_visible = checked;
         ctx.update(settings);
     });
 
@@ -163,21 +154,6 @@ pub fn SettingsDialog() -> impl IntoView {
                                 </Select>
                             </div>
 
-                            <Separator />
-
-                            // Sidebar visible setting
-                            <div class="flex items-center justify-between py-3">
-                                <div>
-                                    <div class="text-sm font-medium">"Sidebar Visible"</div>
-                                    <div class="text-xs text-muted-foreground">
-                                        "Show the sidebar on startup"
-                                    </div>
-                                </div>
-                                <Switch
-                                    checked=ctx.settings.get_untracked().appearance.sidebar_visible
-                                    on_change=on_sidebar_toggle
-                                />
-                            </div>
                         </Show>
                     </div>
                 </div>

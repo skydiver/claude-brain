@@ -18,8 +18,8 @@ const PAGE_SIZE: u32 = 20;
 pub fn BrowsePage() -> impl IntoView {
     // UI state — restore sidebar visibility from settings
     let ctx = expect_context::<SettingsContext>();
-    let initial_sidebar = ctx.settings.get_untracked().appearance.sidebar_visible;
-    let (sidebar_visible, set_sidebar_visible) = signal(initial_sidebar);
+    let initial_sidebar = ctx.settings.get_untracked().appearance.filters_sidebar_visible;
+    let (filters_sidebar_visible, set_filters_sidebar_visible) = signal(initial_sidebar);
 
     // Filter state
     let (selected_type, set_selected_type) = signal(None::<String>);
@@ -364,15 +364,15 @@ pub fn BrowsePage() -> impl IntoView {
                         <button
                             class=move || format!(
                                 "p-1 rounded transition-colors mr-auto {}",
-                                if sidebar_visible.get() { "bg-muted text-foreground" } else { "text-muted-foreground hover:bg-muted" }
+                                if filters_sidebar_visible.get() { "bg-muted text-foreground" } else { "text-muted-foreground hover:bg-muted" }
                             )
                             title="Toggle filters"
                             on:click=move |e: web_sys::MouseEvent| {
                                 e.stop_propagation();
-                                let new_state = !sidebar_visible.get_untracked();
-                                set_sidebar_visible.set(new_state);
+                                let new_state = !filters_sidebar_visible.get_untracked();
+                                set_filters_sidebar_visible.set(new_state);
                                 let mut settings = ctx.settings.get_untracked();
-                                settings.appearance.sidebar_visible = new_state;
+                                settings.appearance.filters_sidebar_visible = new_state;
                                 ctx.update(settings);
                             }
                         >
@@ -397,7 +397,7 @@ pub fn BrowsePage() -> impl IntoView {
             <div class="flex flex-1 min-h-0">
                 <div class=move || format!(
                     "transition-all duration-300 ease-in-out overflow-hidden {}",
-                    if sidebar_visible.get() { "w-[200px] min-w-[200px]" } else { "w-0 min-w-0" }
+                    if filters_sidebar_visible.get() { "w-[200px] min-w-[200px]" } else { "w-0 min-w-0" }
                 )>
                     <Sidebar
                         selected_type=selected_type

@@ -7,4 +7,5 @@ pub mod scroll_area;
 #[allow(dead_code)]
 pub mod select;
 pub mod separator;
+#[allow(dead_code)]
 pub mod switch;

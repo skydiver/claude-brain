@@ -68,14 +68,14 @@ pub struct AppearanceSettings {
     #[serde(default)]
     pub theme: Theme,
     #[serde(default = "default_true")]
-    pub sidebar_visible: bool,
+    pub filters_sidebar_visible: bool,
 }
 
 impl Default for AppearanceSettings {
     fn default() -> Self {
         Self {
             theme: Theme::default(),
-            sidebar_visible: true,
+            filters_sidebar_visible: true,
         }
     }
 }

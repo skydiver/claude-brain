@@ -16,14 +16,14 @@ pub struct AppearanceSettings {
     #[serde(default)]
     pub theme: Theme,
     #[serde(default = "default_true")]
-    pub sidebar_visible: bool,
+    pub filters_sidebar_visible: bool,
 }
 
 impl Default for AppearanceSettings {
     fn default() -> Self {
         Self {
             theme: Theme::default(),
-            sidebar_visible: true,
+            filters_sidebar_visible: true,
         }
     }
 }
@@ -85,7 +85,7 @@ mod tests {
     fn test_default_settings() {
         let settings = Settings::default();
         assert_eq!(settings.appearance.theme, Theme::System);
-        assert!(settings.appearance.sidebar_visible);
+        assert!(settings.appearance.filters_sidebar_visible);
     }
 
     #[test]
@@ -103,13 +103,13 @@ mod tests {
         let settings = Settings {
             appearance: AppearanceSettings {
                 theme: Theme::DefaultDark,
-                sidebar_visible: false,
+                filters_sidebar_visible: false,
             },
         };
         let json = serde_json::to_string(&settings).unwrap();
         let parsed: Settings = serde_json::from_str(&json).unwrap();
         assert_eq!(parsed.appearance.theme, Theme::DefaultDark);
-        assert!(!parsed.appearance.sidebar_visible);
+        assert!(!parsed.appearance.filters_sidebar_visible);
     }
 
     #[test]
@@ -117,14 +117,14 @@ mod tests {
         let json = r#"{"appearance": {"theme": "default-dark"}}"#;
         let settings: Settings = serde_json::from_str(json).unwrap();
         assert_eq!(settings.appearance.theme, Theme::DefaultDark);
-        assert!(settings.appearance.sidebar_visible);
+        assert!(settings.appearance.filters_sidebar_visible);
     }
 
     #[test]
     fn test_empty_json_gets_defaults() {
         let settings: Settings = serde_json::from_str("{}").unwrap();
         assert_eq!(settings.appearance.theme, Theme::System);
-        assert!(settings.appearance.sidebar_visible);
+        assert!(settings.appearance.filters_sidebar_visible);
     }
 
     #[test]
@@ -141,7 +141,7 @@ mod tests {
         let settings = Settings {
             appearance: AppearanceSettings {
                 theme: Theme::DefaultLight,
-                sidebar_visible: false,
+                filters_sidebar_visible: false,
             },
         };
 
@@ -150,6 +150,6 @@ mod tests {
 
         let loaded: Settings = serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
         assert_eq!(loaded.appearance.theme, Theme::DefaultLight);
-        assert!(!loaded.appearance.sidebar_visible);
+        assert!(!loaded.appearance.filters_sidebar_visible);
     }
 }
