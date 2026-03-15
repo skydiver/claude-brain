@@ -6,20 +6,19 @@ use wasm_bindgen_futures::spawn_local;
 use crate::api;
 use crate::components::entry_detail::EntryDetail;
 use crate::components::entry_list::EntryList;
+use crate::components::settings_dialog::SettingsDialog;
 use crate::components::sidebar::Sidebar;
-use leptos_icons::Icon;
 use crate::models::{Entry, Stats};
+use crate::settings::SettingsContext;
+use leptos_icons::Icon;
 
 const PAGE_SIZE: u32 = 20;
 
 #[component]
 pub fn BrowsePage() -> impl IntoView {
-    // UI state — restore sidebar visibility from localStorage
-    let initial_sidebar = web_sys::window()
-        .and_then(|w| w.local_storage().ok().flatten())
-        .and_then(|s: web_sys::Storage| s.get_item("sidebar_visible").ok().flatten())
-        .map(|v| v != "false")
-        .unwrap_or(true);
+    // UI state — restore sidebar visibility from settings
+    let ctx = expect_context::<SettingsContext>();
+    let initial_sidebar = ctx.settings.get_untracked().appearance.sidebar_visible;
     let (sidebar_visible, set_sidebar_visible) = signal(initial_sidebar);
 
     // Filter state
@@ -372,11 +371,9 @@ pub fn BrowsePage() -> impl IntoView {
                                 e.stop_propagation();
                                 let new_state = !sidebar_visible.get_untracked();
                                 set_sidebar_visible.set(new_state);
-                                if let Some(storage) = web_sys::window()
-                                    .and_then(|w| -> Option<web_sys::Storage> { w.local_storage().ok().flatten() })
-                                {
-                                    let _ = storage.set_item("sidebar_visible", &new_state.to_string());
-                                }
+                                let mut settings = ctx.settings.get_untracked();
+                                settings.appearance.sidebar_visible = new_state;
+                                ctx.update(settings);
                             }
                         >
                             <span class="size-3.5"><Icon icon=icondata::LuPanelLeft /></span>
@@ -391,6 +388,7 @@ pub fn BrowsePage() -> impl IntoView {
                         >
                             <span class="size-3.5"><Icon icon=icondata::LuRefreshCw /></span>
                         </button>
+                        <SettingsDialog />
                     </div>
                 }
             }

@@ -4,4 +4,6 @@ pub mod search_bar;
 pub mod sidebar;
 pub mod tag_badge;
 pub mod type_icon;
+pub mod settings_dialog;
 pub mod ui;
+pub mod hooks;
