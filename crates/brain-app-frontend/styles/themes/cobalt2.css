@@ -1,0 +1,32 @@
+.theme-cobalt2 {
+  --background: #193549;
+  --foreground: #e1efff;
+  --card: #15232d;
+  --card-foreground: #e1efff;
+  --popover: #15232d;
+  --popover-foreground: #e1efff;
+  --primary: #ffc600;
+  --primary-foreground: #193549;
+  --secondary: #1f4662;
+  --secondary-foreground: #e1efff;
+  --muted: #1f4662;
+  --muted-foreground: #7da0b8;
+  --accent: #1f4662;
+  --accent-foreground: #ffc600;
+  --destructive: #ff628c;
+  --destructive-foreground: #e1efff;
+  --border: #2a5a7b;
+  --input: #2a5a7b;
+  --ring: #ffc600;
+  --color-surface: #15232d;
+  --color-accent: #ffc600;
+  --color-type-learning: #80fcff;
+  --color-type-gotcha: #ff9d00;
+  --color-type-project: #3ad900;
+  --success-light: #1f4662;
+  --success-dark: #3ad900;
+  --warning-light: #1f4662;
+  --warning-dark: #ff9d00;
+  --info-light: #1f4662;
+  --info-dark: #80fcff;
+}

@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod commands;
+pub mod settings;
 mod state;
 
 use brain_core::db::Database;
@@ -44,6 +45,8 @@ fn main() {
             commands::list_technologies,
             commands::list_tags,
             commands::stats,
+            commands::get_settings,
+            commands::update_settings,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

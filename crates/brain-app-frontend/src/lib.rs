@@ -13,4 +13,6 @@ pub mod components;
 #[cfg(target_arch = "wasm32")]
 pub mod pages;
 #[cfg(target_arch = "wasm32")]
+pub mod settings;
+#[cfg(target_arch = "wasm32")]
 pub mod theme;

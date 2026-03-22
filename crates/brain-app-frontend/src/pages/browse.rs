@@ -6,21 +6,20 @@ use wasm_bindgen_futures::spawn_local;
 use crate::api;
 use crate::components::entry_detail::EntryDetail;
 use crate::components::entry_list::EntryList;
+use crate::components::settings_dialog::SettingsDialog;
 use crate::components::sidebar::Sidebar;
-use leptos_icons::Icon;
 use crate::models::{Entry, Stats};
+use crate::settings::SettingsContext;
+use leptos_icons::Icon;
 
 const PAGE_SIZE: u32 = 20;
 
 #[component]
 pub fn BrowsePage() -> impl IntoView {
-    // UI state — restore sidebar visibility from localStorage
-    let initial_sidebar = web_sys::window()
-        .and_then(|w| w.local_storage().ok().flatten())
-        .and_then(|s: web_sys::Storage| s.get_item("sidebar_visible").ok().flatten())
-        .map(|v| v != "false")
-        .unwrap_or(true);
-    let (sidebar_visible, set_sidebar_visible) = signal(initial_sidebar);
+    // UI state — restore sidebar visibility from settings
+    let ctx = expect_context::<SettingsContext>();
+    let initial_sidebar = ctx.settings.get_untracked().appearance.filters_sidebar_visible;
+    let (filters_sidebar_visible, set_filters_sidebar_visible) = signal(initial_sidebar);
 
     // Filter state
     let (selected_type, set_selected_type) = signal(None::<String>);
@@ -362,35 +361,58 @@ pub fn BrowsePage() -> impl IntoView {
                     >
                         <span class="text-xs font-semibold text-muted-foreground">"ClaudeBrain"</span>
                         <div class="mx-3 h-4 w-px bg-border"></div>
-                        <button
-                            class=move || format!(
-                                "p-1 rounded transition-colors mr-auto {}",
-                                if sidebar_visible.get() { "bg-muted text-foreground" } else { "text-muted-foreground hover:bg-muted" }
-                            )
-                            title="Toggle filters"
-                            on:click=move |e: web_sys::MouseEvent| {
-                                e.stop_propagation();
-                                let new_state = !sidebar_visible.get_untracked();
-                                set_sidebar_visible.set(new_state);
-                                if let Some(storage) = web_sys::window()
-                                    .and_then(|w| -> Option<web_sys::Storage> { w.local_storage().ok().flatten() })
-                                {
-                                    let _ = storage.set_item("sidebar_visible", &new_state.to_string());
-                                }
+                        {
+                            let settings_open = move || {
+                                use_context::<crate::components::settings_dialog::SettingsOpen>()
+                                    .map(|s| s.0.get())
+                                    .unwrap_or(false)
+                            };
+                            view! {
+                                <button
+                                    class=move || format!(
+                                        "p-1 rounded transition-colors mr-auto {}",
+                                        if settings_open() {
+                                            "text-muted-foreground opacity-20 cursor-default"
+                                        } else if filters_sidebar_visible.get() {
+                                            "bg-muted text-foreground"
+                                        } else {
+                                            "text-muted-foreground hover:bg-muted"
+                                        }
+                                    )
+                                    title="Toggle filters"
+                                    on:click=move |e: web_sys::MouseEvent| {
+                                        e.stop_propagation();
+                                        if settings_open() { return; }
+                                        let new_state = !filters_sidebar_visible.get_untracked();
+                                        set_filters_sidebar_visible.set(new_state);
+                                        let mut settings = ctx.settings.get_untracked();
+                                        settings.appearance.filters_sidebar_visible = new_state;
+                                        ctx.update(settings);
+                                    }
+                                >
+                                    <span class="size-3.5"><Icon icon=icondata::LuPanelLeft /></span>
+                                </button>
+                                <button
+                                    class=move || format!(
+                                        "p-1 rounded transition-colors {}",
+                                        if settings_open() {
+                                            "text-muted-foreground opacity-20 cursor-default"
+                                        } else {
+                                            "text-muted-foreground hover:bg-muted"
+                                        }
+                                    )
+                                    title="Refresh"
+                                    on:click=move |e: web_sys::MouseEvent| {
+                                        e.stop_propagation();
+                                        if settings_open() { return; }
+                                        on_refresh.run(());
+                                    }
+                                >
+                                    <span class="size-3.5"><Icon icon=icondata::LuRefreshCw /></span>
+                                </button>
                             }
-                        >
-                            <span class="size-3.5"><Icon icon=icondata::LuPanelLeft /></span>
-                        </button>
-                        <button
-                            class="p-1 rounded text-muted-foreground hover:bg-muted transition-colors"
-                            title="Refresh"
-                            on:click=move |e: web_sys::MouseEvent| {
-                                e.stop_propagation();
-                                on_refresh.run(());
-                            }
-                        >
-                            <span class="size-3.5"><Icon icon=icondata::LuRefreshCw /></span>
-                        </button>
+                        }
+                        <SettingsDialog />
                     </div>
                 }
             }
@@ -399,7 +421,7 @@ pub fn BrowsePage() -> impl IntoView {
             <div class="flex flex-1 min-h-0">
                 <div class=move || format!(
                     "transition-all duration-300 ease-in-out overflow-hidden {}",
-                    if sidebar_visible.get() { "w-[200px] min-w-[200px]" } else { "w-0 min-w-0" }
+                    if filters_sidebar_visible.get() { "w-[200px] min-w-[200px]" } else { "w-0 min-w-0" }
                 )>
                     <Sidebar
                         selected_type=selected_type

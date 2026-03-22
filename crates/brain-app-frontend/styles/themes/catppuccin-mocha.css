@@ -1,0 +1,32 @@
+.theme-catppuccin-mocha {
+  --background: #1e1e2e;
+  --foreground: #cdd6f4;
+  --card: #313244;
+  --card-foreground: #cdd6f4;
+  --popover: #313244;
+  --popover-foreground: #cdd6f4;
+  --primary: #89b4fa;
+  --primary-foreground: #1e1e2e;
+  --secondary: #313244;
+  --secondary-foreground: #cdd6f4;
+  --muted: #3b3c52;
+  --muted-foreground: #7f849c;
+  --accent: #313244;
+  --accent-foreground: #89b4fa;
+  --destructive: #f38ba8;
+  --destructive-foreground: #1e1e2e;
+  --border: #45475a;
+  --input: #45475a;
+  --ring: #89b4fa;
+  --color-surface: #313244;
+  --color-accent: #89b4fa;
+  --color-type-learning: #89b4fa;
+  --color-type-gotcha: #fab387;
+  --color-type-project: #a6e3a1;
+  --success-light: #313244;
+  --success-dark: #a6e3a1;
+  --warning-light: #313244;
+  --warning-dark: #f9e2af;
+  --info-light: #313244;
+  --info-dark: #89dceb;
+}

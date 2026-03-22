@@ -1,0 +1,32 @@
+.theme-nord {
+  --background: #2e3440;
+  --foreground: #e5e9f0;
+  --card: #3b4252;
+  --card-foreground: #e5e9f0;
+  --popover: #3b4252;
+  --popover-foreground: #e5e9f0;
+  --primary: #88c0d0;
+  --primary-foreground: #2e3440;
+  --secondary: #3b4252;
+  --secondary-foreground: #e5e9f0;
+  --muted: #434c5e;
+  --muted-foreground: #8892a8;
+  --accent: #3b4252;
+  --accent-foreground: #88c0d0;
+  --destructive: #bf616a;
+  --destructive-foreground: #eceff4;
+  --border: #4c566a;
+  --input: #4c566a;
+  --ring: #88c0d0;
+  --color-surface: #3b4252;
+  --color-accent: #88c0d0;
+  --color-type-learning: #81a1c1;
+  --color-type-gotcha: #d08770;
+  --color-type-project: #a3be8c;
+  --success-light: #3b4252;
+  --success-dark: #a3be8c;
+  --warning-light: #3b4252;
+  --warning-dark: #ebcb8b;
+  --info-light: #3b4252;
+  --info-dark: #81a1c1;
+}

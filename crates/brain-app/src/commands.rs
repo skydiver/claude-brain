@@ -105,6 +105,19 @@ pub fn stats(state: State<'_, AppState>) -> Result<Stats, String> {
     db.stats().map_err(|e| e.to_string())
 }
 
+use crate::settings::{self, Settings};
+
+#[tauri::command]
+pub fn get_settings() -> Result<Settings, String> {
+    Ok(settings::load_settings())
+}
+
+#[tauri::command]
+pub fn update_settings(settings: Settings) -> Result<Settings, String> {
+    settings::save_settings(&settings)?;
+    Ok(settings)
+}
+
 #[cfg(test)]
 mod tests {
     use brain_core::db::Database;

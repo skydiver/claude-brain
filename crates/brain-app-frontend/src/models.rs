@@ -54,6 +54,48 @@ pub struct SearchResponse {
     pub total: usize,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+pub enum Theme {
+    #[default]
+    System,
+    DefaultDark,
+    DefaultLight,
+    SolarizedDark,
+    Nord,
+    CatppuccinMocha,
+    Dracula,
+    TokyoNight,
+    Cobalt2,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AppearanceSettings {
+    #[serde(default)]
+    pub theme: Theme,
+    #[serde(default = "default_true")]
+    pub filters_sidebar_visible: bool,
+}
+
+impl Default for AppearanceSettings {
+    fn default() -> Self {
+        Self {
+            theme: Theme::default(),
+            filters_sidebar_visible: true,
+        }
+    }
+}
+
+fn default_true() -> bool {
+    true
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct Settings {
+    #[serde(default)]
+    pub appearance: AppearanceSettings,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Stats {
     pub total: u64,

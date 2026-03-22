@@ -4,7 +4,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 use js_sys::Reflect;
 
-use crate::models::{Entry, SearchResponse, Stats};
+use crate::models::{Entry, SearchResponse, Settings, Stats};
 
 /// Invoke a Tauri IPC command. Handles both success and error (rejected promise) cases.
 async fn invoke<T: serde::de::DeserializeOwned>(
@@ -112,4 +112,17 @@ pub async fn list_tags() -> Result<Vec<String>, String> {
 
 pub async fn fetch_stats() -> Result<Stats, String> {
     invoke("stats", serde_json::json!({})).await
+}
+
+pub async fn get_settings() -> Result<Settings, String> {
+    invoke("get_settings", serde_json::json!({})).await
+}
+
+#[derive(Serialize)]
+struct UpdateSettingsArgs {
+    settings: Settings,
+}
+
+pub async fn update_settings(settings: Settings) -> Result<Settings, String> {
+    invoke("update_settings", UpdateSettingsArgs { settings }).await
 }

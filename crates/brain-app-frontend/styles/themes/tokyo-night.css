@@ -1,0 +1,32 @@
+.theme-tokyo-night {
+  --background: #1a1b26;
+  --foreground: #a9b1d6;
+  --card: #24283b;
+  --card-foreground: #c0caf5;
+  --popover: #24283b;
+  --popover-foreground: #c0caf5;
+  --primary: #7aa2f7;
+  --primary-foreground: #1a1b26;
+  --secondary: #24283b;
+  --secondary-foreground: #c0caf5;
+  --muted: #2f3549;
+  --muted-foreground: #565f89;
+  --accent: #24283b;
+  --accent-foreground: #7aa2f7;
+  --destructive: #f7768e;
+  --destructive-foreground: #c0caf5;
+  --border: #3b4261;
+  --input: #3b4261;
+  --ring: #7aa2f7;
+  --color-surface: #24283b;
+  --color-accent: #7aa2f7;
+  --color-type-learning: #7aa2f7;
+  --color-type-gotcha: #ff9e64;
+  --color-type-project: #9ece6a;
+  --success-light: #24283b;
+  --success-dark: #9ece6a;
+  --warning-light: #24283b;
+  --warning-dark: #e0af68;
+  --info-light: #24283b;
+  --info-dark: #7dcfff;
+}
